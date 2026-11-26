@@ -291,9 +291,9 @@
         <div style="text-align:right; font-size:12px; color:var(--muted);" id="sumEng">영어 2등급</div>
       </div>
       <div class="summary-stats">
-        <div class="stat-pill"><b style="color:var(--mint);" id="cntSafe">0</b><span>🟢 안정</span></div>
-        <div class="stat-pill"><b style="color:var(--blue);" id="cntFit">0</b><span>🔵 적정</span></div>
-        <div class="stat-pill"><b style="color:var(--gold);" id="cntReach">0</b><span>🟡 소신·상향</span></div>
+        <div class="stat-pill" style="cursor:pointer;" onclick="quickFilter('safe')"><b style="color:var(--mint);" id="cntSafe">0</b><span>🟢 안정</span></div>
+        <div class="stat-pill" style="cursor:pointer;" onclick="quickFilter('fit')"><b style="color:var(--blue);" id="cntFit">0</b><span>🔵 적정</span></div>
+        <div class="stat-pill" style="cursor:pointer;" onclick="quickFilter('reach')"><b style="color:var(--gold);" id="cntReach">0</b><span>🟡 소신·상향</span></div>
       </div>
     </div>
 
@@ -648,7 +648,11 @@
       });
 
       // Sort by closest match / relevance (safe -> fit -> reach -> hard, cut desc)
-      list.sort((a, b) => b.cut - a.cut);
+      const order = { reach: 0, fit: 1, safe: 2, hard: 3 };
+      list.sort((a, b) => {
+        if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+        return b.cut - a.cut;
+      });
       lastResults = list;
 
       document.getElementById('sumAvg').innerHTML = `${rawAvg.toFixed(1)} <small>(약 ${pctToEstNumGrade(rawAvg)}등급)</small>`;
@@ -675,11 +679,24 @@
       });
     });
 
+    function quickFilter(st) {
+      state.filter = st;
+      state.gun = 'all';
+      document.querySelectorAll('#filterBar .f-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.filter === st);
+      });
+      renderCards();
+    }
+
     function renderCards() {
       const box = document.getElementById('resList');
-      let items = lastResults;
+      const gunFiltered = state.gun === 'all' ? lastResults : lastResults.filter(x => x.gun === state.gun);
+      document.getElementById('cntSafe').textContent = gunFiltered.filter(x => x.status === 'safe').length;
+      document.getElementById('cntFit').textContent = gunFiltered.filter(x => x.status === 'fit').length;
+      document.getElementById('cntReach').textContent = gunFiltered.filter(x => x.status === 'reach').length;
+
+      let items = gunFiltered;
       if (state.filter !== 'all') items = items.filter(x => x.status === state.filter);
-      if (state.gun !== 'all') items = items.filter(x => x.gun === state.gun);
 
       if (!items.length) {
         box.innerHTML = `<div class="panel" style="text-align:center; color:var(--muted); font-size:13px;">해당 조건에 맞는 대학이 없어요. 다른 탭을 눌러 확인해 보세요!</div>`;
