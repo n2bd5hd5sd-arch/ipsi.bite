@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>2027 정시 지원 예측기 | 입시먹방 @ipsi.bite</title>
+  <meta name="description" content="국·수·영·탐 백분위와 등급을 입력하면 대학별 2027 정시 반영비율과 영어 감점을 계산해 안정·적정·상향 대학을 예측해 줍니다." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080d11;
+      --bg2: #0f171e;
+      --card: #151f28;
+      --card2: #1b2833;
+      --border: rgba(46, 232, 180, 0.22);
+      --mint: #2ee8b4;
+      --mint-dim: rgba(46, 232, 180, 0.14);
+      --gold: #ffd05c;
+      --blue: #58b4ff;
+      --red: #ff6b7a;
+      --text: #f3f7fa;
+      --muted: #8fa2b2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 50% -10%, rgba(46, 232, 180, 0.14), transparent 55%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.45;
+      padding-bottom: 64px;
+    }
+    .wrap { max-width: 520px; margin: 0 auto; padding: 18px 16px 40px; }
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--mint-dim); border: 1px solid var(--border);
+      color: var(--mint); padding: 6px 13px; border-radius: 999px;
+      font-size: 13px; font-weight: 700; text-decoration: none;
+    }
+    .link-mbti {
+      font-size: 12px; color: var(--gold); text-decoration: none;
+      background: rgba(255, 208, 92, 0.1); border: 1px solid rgba(255, 208, 92, 0.28);
+      padding: 6px 11px; border-radius: 999px; font-weight: 700;
+    }
+    .hero {
+      background: linear-gradient(155deg, #132229 0%, #0d151b 100%);
+      border: 1px solid var(--border); border-radius: 22px;
+      padding: 20px 18px; margin-bottom: 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    .hero .eyebrow { font-size: 12px; font-weight: 700; color: var(--mint); letter-spacing: 0.4px; margin-bottom: 6px; }
+    .hero h1 { font-size: 22px; font-weight: 900; line-height: 1.3; margin-bottom: 8px; }
+    .hero h1 span { color: var(--gold); }
+    .hero p { font-size: 13px; color: var(--muted); }
+
+    .panel {
+      background: var(--card); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 18px 16px; margin-bottom: 16px;
+    }
+    .sec-title {
+      font-size: 14px; font-weight: 800; color: var(--text);
+      margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .sec-title span { font-size: 12px; font-weight: 500; color: var(--muted); }
+
+    .seg-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .seg-btn {
+      background: var(--bg2); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); padding: 10px 6px; border-radius: 12px;
+      font-size: 13px; font-weight: 700; cursor: pointer; text-align: center; transition: 0.15s;
+    }
+    .seg-btn.active {
+      background: var(--mint-dim); border-color: var(--mint); color: var(--mint);
+    }
+
+    .score-row {
+      background: var(--bg2); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 12px 13px; margin-bottom: 10px;
+    }
+    .score-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .score-name { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .grade-tag {
+      font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: rgba(46, 232, 180, 0.12); color: var(--mint);
+    }
+    .score-input-wrap { display: flex; align-items: center; gap: 8px; }
+    .num-input {
+      width: 64px; background: var(--card2); border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text); font-size: 15px; font-weight: 800; text-align: center;
+      border-radius: 10px; padding: 5px 4px; outline: none;
+    }
+    .num-input:focus { border-color: var(--mint); }
+    input[type="range"] {
+      width: 100%; accent-color: var(--mint); cursor: pointer; height: 6px;
+    }
+
+    .eng-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; margin-bottom: 14px; }
+    .eng-btn {
+      background: var(--bg2); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); padding: 8px 0; border-radius: 10px;
+      font-size: 13px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .eng-btn.active { background: var(--gold); color: #111; border-color: var(--gold); }
+
+    .check-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .chip-toggle {
+      flex: 1; min-width: 140px;
+      background: var(--bg2); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); padding: 9px 10px; border-radius: 12px;
+      font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .chip-toggle.active {
+      background: rgba(88, 180, 255, 0.14); border-color: var(--blue); color: var(--blue);
+    }
+
+    .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .preset-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); font-size: 11px; font-weight: 600; padding: 5px 10px;
+      border-radius: 999px; cursor: pointer;
+    }
+    .preset-btn:hover { color: var(--text); border-color: var(--mint); }
+
+    .cta-btn {
+      width: 100%; padding: 15px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, var(--mint), #18c996);
+      color: #061410; font-size: 16px; font-weight: 900; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(46, 232, 180, 0.25);
+    }
+    .cta-btn:active { transform: scale(0.99); }
+
+    /* Summary Box */
+    .summary-box {
+      background: linear-gradient(145deg, #16262f, #111b22);
+      border: 1px solid var(--mint); border-radius: 18px;
+      padding: 16px; margin-bottom: 14px; display: none;
+    }
+    .summary-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .summary-score { font-size: 26px; font-weight: 900; color: var(--gold); }
+    .summary-score small { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+    .stat-pill { background: rgba(0,0,0,0.28); padding: 8px 4px; border-radius: 12px; }
+    .stat-pill b { display: block; font-size: 16px; }
+    .stat-pill span { font-size: 11px; color: var(--muted); }
+
+    /* Filter Tabs */
+    .filter-bar { display: none; gap: 6px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px; }
+    .f-tab {
+      white-space: nowrap; background: var(--card); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); padding: 7px 13px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .f-tab.active { background: var(--text); color: #0b1014; border-color: var(--text); }
+
+    /* Result Cards */
+    .res-list { display: flex; flex-direction: column; gap: 10px; }
+    .u-card {
+      background: var(--card); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 14px 15px; transition: 0.15s;
+    }
+    .u-card.safe { border-left: 4px solid var(--mint); }
+    .u-card.fit { border-left: 4px solid var(--blue); }
+    .u-card.reach { border-left: 4px solid var(--gold); }
+    .u-card.hard { border-left: 4px solid var(--red); opacity: 0.78; }
+
+    .u-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .u-name { font-size: 16px; font-weight: 800; }
+    .u-dept { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .u-badge {
+      font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+    }
+    .b-safe { background: rgba(46, 232, 180, 0.16); color: var(--mint); }
+    .b-fit { background: rgba(88, 180, 255, 0.16); color: var(--blue); }
+    .b-reach { background: rgba(255, 208, 92, 0.16); color: var(--gold); }
+    .b-hard { background: rgba(255, 107, 122, 0.16); color: var(--red); }
+
+    .u-bars { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12px; }
+    .bar-bg { flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; position: relative; }
+    .bar-fill { height: 100%; border-radius: 99px; }
+    .u-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--muted); }
+    .u-tag { background: var(--bg2); padding: 3px 8px; border-radius: 6px; }
+    .u-tip { margin-top: 7px; font-size: 12px; color: var(--mint); font-weight: 600; }
+
+    .share-box {
+      display: none; margin-top: 16px; background: var(--card2); border: 1px dashed var(--border);
+      border-radius: 16px; padding: 14px; text-align: center;
+    }
+    .share-btn {
+      margin-top: 10px; background: var(--bg); border: 1px solid var(--mint); color: var(--mint);
+      padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer;
+    }
+    .disclaimer {
+      margin-top: 20px; font-size: 11px; color: var(--muted); line-height: 1.55; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top-bar">
+      <a class="brand" href="https://instagram.com/ipsi.bite" target="_blank">🍽️ @ipsi.bite 입시먹방</a>
+      <a class="link-mbti" href="../">🍮 공부 푸딩 테스트</a>
+    </div>
+
+    <div class="hero">
+      <div class="eyebrow">2027학년도 정시 가채점·요강 반영</div>
+      <h1>내 성적으로 가는<br /><span>2027 정시 지원 예측기</span></h1>
+      <p>국·수·영·탐 백분위와 등급을 넣으면 대학별 2027 반영비율·영어 감점·가산점을 계산해 안정·적정·상향 대학을 보여줘요.</p>
+    </div>
+
+    <div class="panel">
+      <div class="sec-title">1. 지원 계열 선택</div>
+      <div class="seg-group" id="trackGroup">
+        <button class="seg-btn active" data-track="hum">인문·상경</button>
+        <button class="seg-btn" data-track="nat">자연·공학</button>
+        <button class="seg-btn" data-track="med">의·치·한·약</button>
+      </div>
+
+      <div class="sec-title">
+        2. 영역별 백분위 입력
+        <span>빠른 입력:</span>
+      </div>
+      <div class="preset-row">
+        <button class="preset-btn" onclick="applyPreset(98,98,97,97,1)">올1 최상위</button>
+        <button class="preset-btn" onclick="applyPreset(92,90,91,89,2)">2등급 초반</button>
+        <button class="preset-btn" onclick="applyPreset(82,80,79,81,3)">평균 3등급</button>
+        <button class="preset-btn" onclick="applyPreset(70,68,72,69,3)">3~4등급 혼합</button>
+      </div>
+
+      <div class="score-row">
+        <div class="score-head">
+          <div class="score-name">국어 백분위 <span class="grade-tag" id="gKor">2등급</span></div>
+          <div class="score-input-wrap">
+            <input class="num-input" type="number" id="inKor" min="0" max="100" value="85" />
+          </div>
+        </div>
+        <input type="range" id="rngKor" min="0" max="100" value="85" />
+      </div>
+
+      <div class="score-row">
+        <div class="score-head">
+          <div class="score-name">수학 백분위 <span class="grade-tag" id="gMath">3등급</span></div>
+          <div class="score-input-wrap">
+            <input class="num-input" type="number" id="inMath" min="0" max="100" value="82" />
+          </div>
+        </div>
+        <input type="range" id="rngMath" min="0" max="100" value="82" />
+      </div>
+
+      <div class="score-row">
+        <div class="score-head">
+          <div class="score-name">탐구 1 백분위 <span class="grade-tag" id="gT1">3등급</span></div>
+          <div class="score-input-wrap">
+            <input class="num-input" type="number" id="inT1" min="0" max="100" value="80" />
+          </div>
+        </div>
+        <input type="range" id="rngT1" min="0" max="100" value="80" />
+      </div>
+
+      <div class="score-row">
+        <div class="score-head">
+          <div class="score-name">탐구 2 백분위 <span class="grade-tag" id="gT2">3등급</span></div>
+          <div class="score-input-wrap">
+            <input class="num-input" type="number" id="inT2" min="0" max="100" value="83" />
+          </div>
+        </div>
+        <input type="range" id="rngT2" min="0" max="100" value="83" />
+      </div>
+
+      <div class="sec-title" style="margin-top:14px;">3. 영어 등급</div>
+      <div class="eng-grid" id="engGrid"></div>
+
+      <div class="check-row">
+        <button class="chip-toggle" id="btnCalc" onclick="toggleOpt('calc')">수학 미적·기하 응시</button>
+        <button class="chip-toggle" id="btnSci" onclick="toggleOpt('sci')">과탐 2과목 응시</button>
+      </div>
+
+      <button class="cta-btn" onclick="runPredict()">🎯 내 성적으로 지원 대학 예측하기</button>
+    </div>
+
+    <div class="summary-box" id="summaryBox">
+      <div class="summary-top">
+        <div>
+          <div style="font-size:12px; color:var(--mint); font-weight:700;">내 국·수·탐 평균 백분위</div>
+          <div class="summary-score" id="sumAvg">82.5 <small>(평균 3.1등급)</small></div>
+        </div>
+        <div style="text-align:right; font-size:12px; color:var(--muted);" id="sumEng">영어 2등급</div>
+      </div>
+      <div class="summary-stats">
+        <div class="stat-pill"><b style="color:var(--mint);" id="cntSafe">0</b><span>🟢 안정</span></div>
+        <div class="stat-pill"><b style="color:var(--blue);" id="cntFit">0</b><span>🔵 적정</span></div>
+        <div class="stat-pill"><b style="color:var(--gold);" id="cntReach">0</b><span>🟡 소신·상향</span></div>
+      </div>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="f-tab active" data-filter="all">전체 보기</button>
+      <button class="f-tab" data-filter="safe">🟢 안정</button>
+      <button class="f-tab" data-filter="fit">🔵 적정</button>
+      <button class="f-tab" data-filter="reach">🟡 소신·상향</button>
+      <button class="f-tab" data-gun="가">가군</button>
+      <button class="f-tab" data-gun="나">나군</button>
+      <button class="f-tab" data-gun="다">다군</button>
+    </div>
+
+    <div class="res-list" id="resList"></div>
+
+    <div class="share-box" id="shareBox">
+      <div style="font-size:14px; font-weight:800;">내 예측 결과 저장하고 친구랑 비교하기!</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;">스토리 태그 @ipsi.bite 하면 목표 대학 잠금화면도 제작해 드려요 🍀</div>
+      <button class="share-btn" onclick="copyResult()">📋 내 예측 결과 요약 복사하기</button>
+    </div>
+
+    <p class="disclaimer">
+      ※ 본 예측기는 2027학년도 주요 대학 정시모집요강(반영비율·영어 감점/가산)과<br />
+      가채점 배치표(종로학원·진학사·메가스터디·대입닷컴 공개 자료)를 바탕으로 만든 참고용 시뮬레이션입니다.<br />
+      실제 원서 접수 전에는 12/11 실채점 성적표와 대학별 변환표준점수를 꼭 확인해 주세요.
+    </p>
+  </div>
+
+  <script>
+    // 2027 정시 주요 대학 DB (track, gun, name, dept, cutPct, w: [kor, math, eng, tam], engTable(1~9 penalty/score), mathBonus, sciBonus, tip)
+    const UNIVERSE = [
+      // 의약학계열
+      { track:'med', gun:'가', name:'서울대', dept:'의예과', cut:99.3, w:[33.3,40.0,0,26.7], engPen:[0,0.5,2.0,4.0,6.0,8.0,10.0,12.0,14.0], mb:0, sb:0, tip:'수학 가중치 1.2배 · 교과평가 20% 반영' },
+      { track:'med', gun:'가', name:'연세대', dept:'의예과', cut:99.1, w:[22.2,33.3,11.1,33.3], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:3, tip:'과탐 응시 시 과목당 가산 · 영어 2등급 감점 큼' },
+      { track:'med', gun:'가', name:'고려대', dept:'의과대학', cut:99.0, w:[31.25,37.5,0,31.25], engPen:[0,1.5,3.0,4.5,6.0,7.5,9.0,10.5,12.0], mb:0, sb:0, tip:'영어 2등급 감점 3점(1000점 기준)으로 비교적 완만' },
+      { track:'med', gun:'가', name:'성균관대', dept:'의예과', cut:99.0, w:[30,40,10,20], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'수학 40% 비중 높고 인적성 면접 P/F' },
+      { track:'med', gun:'가', name:'한양대', dept:'의예과', cut:98.6, w:[25,40,10,25], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'수학 40% · 탐구 25%' },
+      { track:'med', gun:'나', name:'경희대', dept:'의예과', cut:98.5, w:[25,40,0,35], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:3, tip:'수학 40% · 탐구 35%로 과탐 비중 큼' },
+      { track:'med', gun:'다', name:'중앙대', dept:'의학부', cut:98.5, w:[30,35,0,35], engPen:[0,1.0,2.5,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:5, tip:'다군 최상위권 의대 · 과탐 5% 가산' },
+      { track:'med', gun:'가', name:'서울대', dept:'약학계열', cut:97.4, w:[33.3,40.0,0,26.7], engPen:[0,0.5,2.0,4.0,6.0,8.0,10.0,12.0,14.0], mb:0, sb:0, tip:'수학 가중치 1.2배 · 교과평가 포함' },
+      { track:'med', gun:'나', name:'성균관대', dept:'약학과', cut:96.4, w:[30,40,10,20], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'수학 40% · 영어 10%' },
+      { track:'med', gun:'가', name:'경희대', dept:'한의예과', cut:96.3, w:[25,40,0,35], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:2, tip:'한의예 자연계열 기준 (인문은 별도 선발)' },
+      { track:'med', gun:'다', name:'동국대', dept:'약학과', cut:95.6, w:[25,35,15,25], engPen:[0,1.0,2.5,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:0, tip:'다군 약대 대표 모집단위' },
+
+      // 인문·상경 (최상위 ~ 인서울 ~ 수도권)
+      { track:'hum', gun:'나', name:'서울대', dept:'경영·경제·정외', cut:97.8, w:[33.3,40.0,0,26.7], engPen:[0,0.5,2.0,4.0,6.0,8.0,10.0,12.0,14.0], mb:0, sb:0, tip:'인문도 수학 가중치 1.2배 · 영어 감점 적음' },
+      { track:'hum', gun:'가', name:'연세대', dept:'경영·상경계열', cut:96.2, w:[33.3,33.3,16.7,16.7], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:0, tip:'영어 반영비 16.7%로 1등급 유리' },
+      { track:'hum', gun:'가', name:'고려대', dept:'경영·경제·정외', cut:96.0, w:[35.7,35.7,0,28.6], engPen:[0,1.5,3.0,4.5,6.0,7.5,9.0,10.5,12.0], mb:0, sb:0, tip:'국·수 균형 35.7% · 영어 감점 적은 편' },
+      { track:'hum', gun:'나', name:'성균관대', dept:'글로벌경영·사과', cut:94.5, w:[40,40,10,10], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'국·수 우수영역 45% 반영 · 탐구 비중 10%로 낮음' },
+      { track:'hum', gun:'가', name:'서강대', dept:'경영·인문계열', cut:94.2, w:[40,40,0,20], engPen:[0,0.5,1.5,3.0,5.0,7.5,10.0,12.5,15.0], mb:0, sb:0, tip:'A/B유형 중 유리한 산식 자동 적용 · 영어 감점 매우 적음' },
+      { track:'hum', gun:'가', name:'한양대', dept:'정책·경영·인문', cut:93.5, w:[35,35,10,20], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'상경은 국35·수35, 인문은 국35·수30·탐25' },
+      { track:'hum', gun:'가', name:'중앙대', dept:'경영·공공인재', cut:92.2, w:[30,40,0,30], engPen:[0,1.0,2.5,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:0, tip:'상경은 수학 40% · 인문은 국어 35%' },
+      { track:'hum', gun:'나', name:'경희대', dept:'경영·사회·인문', cut:91.0, w:[35,35,0,30], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:0, tip:'인문 국어 40% · 사회 국35·수35' },
+      { track:'hum', gun:'가', name:'한국외대', dept:'ELLT·LD·어문', cut:89.8, w:[30,30,20,20], engPen:[0,1.2,2.8,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'영어 반영비 20%로 영어 1등급 강점' },
+      { track:'hum', gun:'나', name:'서울시립대', dept:'세무·경영·인문', cut:90.0, w:[35,25,20,20], engPen:[0,1.2,3.0,5.5,8.5,11.5,14.5,17.5,20.5], mb:0, sb:0, tip:'국어 35% · 영어 20% 비중 높음' },
+      { track:'hum', gun:'나', name:'건국대', dept:'경영·사과·인문', cut:88.8, w:[30,40,10,20], engPen:[0,0.8,2.0,4.0,6.5,9.5,12.5,15.5,18.5], mb:0, sb:0, tip:'영어 2등급 감점 적고 수학 40% 반영' },
+      { track:'hum', gun:'나', name:'동국대', dept:'경찰행정·경영', cut:88.0, w:[35,25,15,25], engPen:[0,0.8,2.2,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:0, tip:'국어 35% · 수학 25%로 국어 강점자 유리' },
+      { track:'hum', gun:'다', name:'홍익대', dept:'경영·인문계열', cut:87.2, w:[33.3,33.3,10,23.4], engPen:[0,1.0,2.5,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:0, tip:'다군 인기 대학 · 3개 영역 균형 반영' },
+      { track:'hum', gun:'가', name:'국민대', dept:'경영·인문·자전', cut:84.8, w:[40,30,10,20], engPen:[0,0.8,2.0,4.5,7.5,10.5,13.5,16.5,19.5], mb:0, sb:0, tip:'국어 40% 반영 · 미래융합C는 수학 미반영' },
+      { track:'hum', gun:'나', name:'숭실대', dept:'인문·경상계열', cut:83.8, w:[35,20,20,25], engPen:[0,0.0,2.0,5.0,8.5,12.0,15.5,19.0,22.0], mb:0, sb:0, tip:'영어 2등급도 1등급과 만점(감점 0점)!' },
+      { track:'hum', gun:'나', name:'세종대', dept:'인문·경영·자전', cut:83.5, w:[30,30,20,20], engPen:[0,1.5,3.5,6.5,10.0,13.5,17.0,20.5,24.0], mb:0, sb:0, tip:'영어 2등급 감점이 다소 커서 1등급 유리' },
+      { track:'hum', gun:'다', name:'단국대', dept:'경영·인문계열', cut:81.5, w:[35,25,20,20], engPen:[0,0.8,2.0,5.0,8.5,12.5,16.5,20.5,24.0], mb:0, sb:0, tip:'다군 인기 · 한국사 4등급까지 만점' },
+      { track:'hum', gun:'나', name:'광운대', dept:'경영·인문계열', cut:80.2, w:[30,25,20,25], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'국·탐 비중 균형 · 영어 20%' },
+      { track:'hum', gun:'가', name:'명지대', dept:'인문·사회과학', cut:78.5, w:[35,25,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'평균 3등급 초반~중반 핵심 인서울 라인' },
+      { track:'hum', gun:'나', name:'상명대', dept:'인문·경영·글로벌', cut:77.2, w:[35,25,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'국어 35% 반영 · 3등급 중반 적정' },
+      { track:'hum', gun:'다', name:'가천대', dept:'경영·사회·인문', cut:78.0, w:[35,25,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'우수영역 순 가중치 전형도 병행 가능' },
+      { track:'hum', gun:'가', name:'인천대', dept:'경영·동북아·인문', cut:76.5, w:[35,25,15,25], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'국립대 가성비 · 국어 35%' },
+      { track:'hum', gun:'나', name:'한성대', dept:'인문·사회과학', cut:74.0, w:[35,25,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'3등급 중후반 ~ 4등급 초반 안정권' },
+
+      // 자연·공학
+      { track:'nat', gun:'나', name:'서울대', dept:'첨단융합·공과대학', cut:96.8, w:[33.3,40.0,0,26.7], engPen:[0,0.5,2.0,4.0,6.0,8.0,10.0,12.0,14.0], mb:0, sb:0, tip:'수학 1.2배 가중 · 과탐Ⅱ 가산점 확인' },
+      { track:'nat', gun:'가', name:'연세대', dept:'시스템반도체·공대', cut:95.4, w:[22.2,33.3,11.1,33.3], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:3, tip:'수학·과탐 각 33.3% · 과탐 가산점' },
+      { track:'nat', gun:'가', name:'고려대', dept:'반도체·공과대학', cut:95.3, w:[31.25,37.5,0,31.25], engPen:[0,1.5,3.0,4.5,6.0,7.5,9.0,10.5,12.0], mb:0, sb:0, tip:'수학 37.5% · 영어 2등급 감점 3점' },
+      { track:'nat', gun:'나', name:'성균관대', dept:'반도체시스템·공학', cut:94.0, w:[30,40,10,20], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'수학 40% · 탐구 20% 반영' },
+      { track:'nat', gun:'가', name:'서강대', dept:'시스템반도체·공학', cut:93.5, w:[36.7,43.3,0,20], engPen:[0,0.5,1.5,3.0,5.0,7.5,10.0,12.5,15.0], mb:0, sb:0, tip:'수학 43.3% 반영 · 영어 감점 적음' },
+      { track:'nat', gun:'가', name:'한양대', dept:'반도체·공과대학', cut:93.2, w:[25,40,10,25], engPen:[0,1.0,2.5,5.0,8.0,11.0,14.0,17.0,20.0], mb:0, sb:0, tip:'수학 40% · 탐구 25%' },
+      { track:'nat', gun:'가', name:'중앙대', dept:'AI·소프트웨어·공대', cut:91.8, w:[30,35,0,35], engPen:[0,1.0,2.5,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:5, tip:'과탐 과목당 5% 가산점 적용' },
+      { track:'nat', gun:'나', name:'경희대', dept:'정보전자·공과대학', cut:90.5, w:[25,40,0,35], engPen:[0,1.5,3.5,6.0,9.0,12.0,15.0,18.0,21.0], mb:0, sb:3, tip:'수학 40% · 과탐 35% + 가산점' },
+      { track:'nat', gun:'나', name:'서울시립대', dept:'컴퓨터·전자전기', cut:89.5, w:[20,40,10,30], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:2, tip:'수학 40% · 국어 비중 20%로 낮음' },
+      { track:'nat', gun:'나', name:'건국대', dept:'스마트ICT·공대', cut:88.5, w:[20,40,10,30], engPen:[0,0.8,2.0,4.0,6.5,9.5,12.5,15.5,18.5], mb:0, sb:0, tip:'수학 40% · 영어 감점 적음' },
+      { track:'nat', gun:'나', name:'동국대', dept:'컴퓨터·AI·공대', cut:87.8, w:[25,35,15,25], engPen:[0,0.8,2.2,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:2, tip:'국·수·탐 밸런스형 공대' },
+      { track:'nat', gun:'다', name:'홍익대', dept:'컴퓨터·건축·공대', cut:87.0, w:[20,40,10,30], engPen:[0,1.0,2.5,4.5,7.0,10.0,13.0,16.0,19.0], mb:0, sb:2, tip:'다군 최상위 공학 라인' },
+      { track:'nat', gun:'가', name:'서울과기대', dept:'AI·컴공·공대', cut:85.2, w:[20,35,20,25], engPen:[0,1.2,3.0,5.5,8.5,11.5,14.5,17.5,20.5], mb:2, sb:2, tip:'국립대 공대 강자 · 미기/과탐 가산' },
+      { track:'nat', gun:'가', name:'국민대', dept:'자동차·SW·공대', cut:84.2, w:[30,40,10,20], engPen:[0,0.8,2.0,4.5,7.5,10.5,13.5,16.5,19.5], mb:0, sb:0, tip:'국어 30%·수학 40% 반영 (탐구 20%)' },
+      { track:'nat', gun:'나', name:'숭실대', dept:'IT대학·공과대학', cut:83.5, w:[20,35,15,30], engPen:[0,0.0,2.0,5.0,8.5,12.0,15.5,19.0,22.0], mb:0, sb:0, tip:'영어 2등급 감점 0점! · 탐구 30%' },
+      { track:'nat', gun:'나', name:'세종대', dept:'소프트웨어·공대', cut:83.2, w:[20,35,20,25], engPen:[0,0.8,2.5,5.5,9.0,12.5,16.0,19.5,23.0], mb:0, sb:0, tip:'SW·컴공 특성화 강점' },
+      { track:'nat', gun:'나', name:'인하대', dept:'기계·항공·공대', cut:82.5, w:[25,35,10,30], engPen:[0,0.8,2.2,4.8,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'탐구 30% 반영 · 영어 2등급 감점 작음' },
+      { track:'nat', gun:'다', name:'단국대', dept:'SW융합·공과대학', cut:81.2, w:[20,35,15,30], engPen:[0,0.8,2.0,5.0,8.5,12.5,16.5,20.5,24.0], mb:3, sb:3, tip:'미적/기하·과탐 각 5% 가산점!' },
+      { track:'nat', gun:'가', name:'명지대', dept:'자연·공과대학', cut:77.8, w:[25,35,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'평균 3등급 자연계 인서울/수도권 핵심' },
+      { track:'nat', gun:'다', name:'가천대', dept:'AI·컴공·공대', cut:77.5, w:[25,35,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'메디컬·IT 집중 투자' },
+      { track:'nat', gun:'가', name:'인천대', dept:'공과·정보기술대', cut:76.0, w:[25,35,15,25], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'국립대 · 평균 3등급 중반 적정' },
+      { track:'nat', gun:'나', name:'한성대', dept:'IT공과대학', cut:73.5, w:[25,35,20,20], engPen:[0,1.0,2.5,5.0,8.0,11.5,15.0,18.5,22.0], mb:0, sb:0, tip:'3등급 중후반 ~ 4등급 초반 안정권' },
+    ];
+
+    let state = {
+      track: 'hum',
+      kor: 85, math: 82, t1: 80, t2: 83,
+      eng: 2,
+      calc: false, sci: false,
+      filter: 'all', gun: 'all'
+    };
+    let lastResults = [];
+
+    function pctToGrade(p) {
+      if (p >= 96) return '1등급';
+      if (p >= 89) return '2등급';
+      if (p >= 77) return '3등급';
+      if (p >= 60) return '4등급';
+      if (p >= 40) return '5등급';
+      if (p >= 23) return '6등급';
+      if (p >= 11) return '7등급';
+      if (p >= 4) return '8등급';
+      return '9등급';
+    }
+
+    function pctToEstNumGrade(p) {
+      if (p >= 96) return (1.0 + (100 - p) * 0.1).toFixed(1);
+      if (p >= 89) return (1.5 + (96 - p) * 0.14).toFixed(1);
+      if (p >= 77) return (2.5 + (89 - p) * 0.08).toFixed(1);
+      if (p >= 60) return (3.5 + (77 - p) * 0.06).toFixed(1);
+      return (4.5 + (60 - p) * 0.05).toFixed(1);
+    }
+
+    // Bind sliders & inputs
+    const pairs = [
+      ['Kor', 'kor', 'gKor'],
+      ['Math', 'math', 'gMath'],
+      ['T1', 't1', 'gT1'],
+      ['T2', 't2', 'gT2']
+    ];
+    pairs.forEach(([suf, key, gId]) => {
+      const rng = document.getElementById('rng' + suf);
+      const inp = document.getElementById('in' + suf);
+      const grd = document.getElementById(gId);
+      const sync = (val) => {
+        val = Math.max(0, Math.min(100, Number(val) || 0));
+        state[key] = val;
+        rng.value = val;
+        inp.value = val;
+        grd.textContent = pctToGrade(val);
+      };
+      rng.addEventListener('input', (e) => sync(e.target.value));
+      inp.addEventListener('input', (e) => sync(e.target.value));
+    });
+
+    // Track buttons
+    document.querySelectorAll('#trackGroup .seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#trackGroup .seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.track = btn.dataset.track;
+      });
+    });
+
+    // English grid
+    const engGrid = document.getElementById('engGrid');
+    for (let g = 1; g <= 9; g++) {
+      const b = document.createElement('button');
+      b.className = 'eng-btn' + (g === state.eng ? ' active' : '');
+      b.textContent = g;
+      b.onclick = () => {
+        state.eng = g;
+        document.querySelectorAll('.eng-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+      };
+      engGrid.appendChild(b);
+    }
+
+    function toggleOpt(k) {
+      state[k] = !state[k];
+      document.getElementById(k === 'calc' ? 'btnCalc' : 'btnSci').classList.toggle('active', state[k]);
+    }
+
+    function applyPreset(k, m, t1, t2, e) {
+      const vals = { kor:k, math:m, t1:t1, t2:t2 };
+      pairs.forEach(([suf, key, gId]) => {
+        state[key] = vals[key];
+        document.getElementById('rng' + suf).value = vals[key];
+        document.getElementById('in' + suf).value = vals[key];
+        document.getElementById(gId).textContent = pctToGrade(vals[key]);
+      });
+      state.eng = e;
+      document.querySelectorAll('.eng-btn').forEach((b, idx) => b.classList.toggle('active', idx + 1 === e));
+      runPredict();
+    }
+
+    function runPredict() {
+      const tamAvg = (state.t1 + state.t2) / 2;
+      const rawAvg = (state.kor + state.math + tamAvg) / 3;
+
+      const list = UNIVERSE.filter(u => u.track === state.track).map(u => {
+        const [wk, wm, we, wt] = u.w;
+        const sumW = wk + wm + wt; // normalize K/M/T weights
+        let myWeighted = (state.kor * wk + state.math * wm + tamAvg * wt) / sumW;
+
+        // English effect (relative to 1등급 baseline)
+        const pen = u.engPen[state.eng - 1];
+        // Bonus if math calc/geom or science
+        let bonus = 0;
+        if (state.calc && u.mb > 0) bonus += u.mb * 0.4;
+        if (state.sci && u.sb > 0) bonus += u.sb * 0.4;
+
+        const effectiveScore = myWeighted - pen * 0.65 + bonus;
+        const diff = effectiveScore - u.cut;
+
+        let status = 'hard', label = '🔴 도전', cls = 'hard', bcls = 'b-hard', prob = 20;
+        if (diff >= 1.8) {
+          status = 'safe'; label = '🟢 안정'; cls = 'safe'; bcls = 'b-safe';
+          prob = Math.min(97, Math.round(82 + diff * 4));
+        } else if (diff >= -0.8) {
+          status = 'fit'; label = '🔵 적정'; cls = 'fit'; bcls = 'b-fit';
+          prob = Math.round(62 + diff * 8);
+        } else if (diff >= -3.2) {
+          status = 'reach'; label = '🟡 소신·상향'; cls = 'reach'; bcls = 'b-reach';
+          prob = Math.max(25, Math.round(48 + diff * 8));
+        } else {
+          prob = Math.max(5, Math.round(22 + diff * 3));
+        }
+
+        return { ...u, effectiveScore, diff, status, label, cls, bcls, prob };
+      });
+
+      // Sort by closest match / relevance (safe -> fit -> reach -> hard, cut desc)
+      list.sort((a, b) => b.cut - a.cut);
+      lastResults = list;
+
+      document.getElementById('sumAvg').innerHTML = `${rawAvg.toFixed(1)} <small>(약 ${pctToEstNumGrade(rawAvg)}등급)</small>`;
+      document.getElementById('sumEng').textContent = `영어 ${state.eng}등급` + (state.calc ? ' · 미기' : '') + (state.sci ? ' · 과탐' : '');
+      document.getElementById('cntSafe').textContent = list.filter(x => x.status === 'safe').length;
+      document.getElementById('cntFit').textContent = list.filter(x => x.status === 'fit').length;
+      document.getElementById('cntReach').textContent = list.filter(x => x.status === 'reach').length;
+
+      document.getElementById('summaryBox').style.display = 'block';
+      document.getElementById('filterBar').style.display = 'flex';
+      document.getElementById('shareBox').style.display = 'block';
+
+      renderCards();
+      document.getElementById('summaryBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.querySelectorAll('#filterBar .f-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#filterBar .f-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        state.filter = tab.dataset.filter || 'all';
+        state.gun = tab.dataset.gun || 'all';
+        renderCards();
+      });
+    });
+
+    function renderCards() {
+      const box = document.getElementById('resList');
+      let items = lastResults;
+      if (state.filter !== 'all') items = items.filter(x => x.status === state.filter);
+      if (state.gun !== 'all') items = items.filter(x => x.gun === state.gun);
+
+      if (!items.length) {
+        box.innerHTML = `<div class="panel" style="text-align:center; color:var(--muted); font-size:13px;">해당 조건에 맞는 대학이 없어요. 다른 탭을 눌러 확인해 보세요!</div>`;
+        return;
+      }
+
+      box.innerHTML = items.map(u => {
+        const diffStr = (u.diff >= 0 ? '+' : '') + u.diff.toFixed(1);
+        const barColor = u.status === 'safe' ? 'var(--mint)' : u.status === 'fit' ? 'var(--blue)' : u.status === 'reach' ? 'var(--gold)' : 'var(--red)';
+        return `
+          <div class="u-card ${u.cls}">
+            <div class="u-top">
+              <div>
+                <div class="u-name">${u.name} <span class="u-dept">${u.dept}</span></div>
+              </div>
+              <div class="u-badge ${u.bcls}">${u.label} (${u.prob}%)</div>
+            </div>
+            <div class="u-bars">
+              <span style="color:var(--muted); min-width:86px;">내 환산 <b style="color:var(--text);">${u.effectiveScore.toFixed(1)}</b></span>
+              <div class="bar-bg"><div class="bar-fill" style="width:${Math.min(100, Math.max(12, u.prob))}%; background:${barColor};"></div></div>
+              <span style="color:var(--muted);">컷 ${u.cut.toFixed(1)} (${diffStr})</span>
+            </div>
+            <div class="u-meta">
+              <span class="u-tag">${u.gun}군</span>
+              <span class="u-tag">국 ${u.w[0]}%</span>
+              <span class="u-tag">수 ${u.w[1]}%</span>
+              <span class="u-tag">탐 ${u.w[3]}%</span>
+              <span class="u-tag">${u.w[2] > 0 ? '영 '+u.w[2]+'%' : '영 가감점'}</span>
+            </div>
+            <div class="u-tip">💡 ${u.tip}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyResult() {
+      const tamAvg = ((state.t1 + state.t2) / 2).toFixed(1);
+      const rawAvg = ((state.kor + state.math + Number(tamAvg)) / 3).toFixed(1);
+      const safes = lastResults.filter(x => x.status === 'safe').slice(0, 3).map(x => `${x.name} ${x.dept}`).join(', ') || '없음';
+      const fits = lastResults.filter(x => x.status === 'fit').slice(0, 3).map(x => `${x.name} ${x.dept}`).join(', ') || '없음';
+      const txt = `[입시먹방 @ipsi.bite 2027 정시 예측]\n• 내 성적: 국${state.kor} / 수${state.math} / 탐${tamAvg} / 영${state.eng}등급 (평균 ${rawAvg})\n• 🟢 안정: ${safes}\n• 🔵 적정: ${fits}\n\n나도 내 성적 넣어보기 👉 https://n2bd5hd5sd-arch.github.io/ipsi.bite/predict/`;
+      navigator.clipboard.writeText(txt).then(() => {
+        alert('예측 결과가 복사되었어요! 친구나 스토리에 공유해 보세요 🙌');
+      });
+    }
+  </script>
+</body>
+</html>
