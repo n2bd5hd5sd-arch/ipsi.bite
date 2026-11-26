@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>입시먹방 공부 적성 MBTI 테스트 | @ipsi.bite</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --card: #151a22;
+      --card-2: #1c222d;
+      --mint: #2ce5a8;
+      --gold: #ffd044;
+      --text: #f5f7fa;
+      --muted: #9aa6b8;
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #132220 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .app {
+      width: 100%;
+      max-width: 440px;
+      min-height: 100vh;
+      padding: 20px 18px 40px;
+      display: flex;
+      flex-direction: column;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--mint);
+      margin-bottom: 18px;
+    }
+    .brand span.tag {
+      background: rgba(44,229,168,0.12);
+      border: 1px solid rgba(44,229,168,0.3);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .screen { display: none; flex-direction: column; flex: 1; animation: fadeUp .28s ease; }
+    .screen.active { display: flex; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Intro */
+    .hero-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px 22px;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .pudding-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .pudding-row img {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+      animation: bob 2.2s ease-in-out infinite;
+    }
+    .pudding-row img:nth-child(2) { animation-delay: .25s; }
+    .pudding-row img:nth-child(3) { animation-delay: .5s; }
+    .pudding-row img:nth-child(4) { animation-delay: .75s; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    h1 { font-size: 26px; line-height: 1.3; margin: 0 0 10px; font-weight: 800; }
+    .sub { font-size: 15px; color: var(--muted); line-height: 1.55; margin: 0 0 22px; }
+    .pill-info {
+      display: inline-flex;
+      gap: 10px;
+      background: var(--card-2);
+      padding: 9px 15px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 16px 20px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, opacity .12s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--mint); color: #09100e; }
+    .btn-secondary { background: var(--card-2); color: var(--text); border: 1px solid var(--border); }
+
+    /* Quiz */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--card-2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--mint), #7bf5cb);
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+    .progress-num { font-size: 13px; font-weight: 700; color: var(--mint); min-width: 42px; text-align: right; }
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 26px 20px;
+      margin-bottom: 16px;
+    }
+    .q-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .q-title { font-size: 20px; line-height: 1.45; font-weight: 800; margin: 0; }
+    .choices { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+    .choice-btn {
+      text-align: left;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 18px 18px;
+      font-size: 15px;
+      line-height: 1.48;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .choice-btn:hover, .choice-btn:active {
+      border-color: var(--mint);
+      background: rgba(44,229,168,0.08);
+    }
+    .back-link {
+      margin-top: auto;
+      padding-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    /* Result */
+    .res-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 28px;
+      padding: 26px 20px;
+      text-align: center;
+    }
+    .res-type-code {
+      display: inline-block;
+      padding: 5px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .res-img { width: 132px; height: 132px; object-fit: contain; margin: 4px auto 12px; display: block; }
+    .res-name { font-size: 24px; font-weight: 800; margin: 0 0 6px; }
+    .res-quote { font-size: 14px; color: var(--gold); font-weight: 700; margin: 0 0 18px; }
+    .res-desc { font-size: 14.5px; line-height: 1.6; color: #d7dee8; text-align: left; background: var(--card-2); padding: 16px; border-radius: 18px; margin-bottom: 14px; }
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-bottom: 18px; }
+    .mini-box { background: var(--card-2); padding: 13px; border-radius: 16px; }
+    .mini-label { font-size: 11.5px; font-weight: 800; color: var(--mint); margin-bottom: 5px; }
+    .mini-val { font-size: 13.5px; font-weight: 700; line-height: 1.4; }
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--mint); color: #09100e; font-weight: 800; font-size: 13.5px;
+      padding: 10px 18px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="brand">
+      <span>@ipsi.bite · 입시먹방</span>
+      <span class="tag">공부 적성 MBTI</span>
+    </div>
+
+    <!-- Intro -->
+    <section id="screen-intro" class="screen active">
+      <div class="hero-box">
+        <div class="pudding-row">
+          <img src="assets/pudding-mint.png" alt="민트 푸딩" />
+          <img src="assets/pudding-gold.png" alt="골드 푸딩" />
+          <img src="assets/pudding-pink.png" alt="핑크 푸딩" />
+          <img src="assets/pudding-sky.png" alt="스카이 푸딩" />
+        </div>
+        <h1>내 공부 적성 푸딩은<br/>무슨 색일까? 🍮</h1>
+        <p class="sub">
+          9개의 질문으로 알아보는<br/>
+          내 공부 스타일 × 찰떡 입시 전략 × 단짝 메이트!
+        </p>
+        <div class="pill-info">⏱️ 1분 컷 · 8가지 푸딩 유형</div>
+        <button class="btn btn-primary" onclick="startQuiz()">검사 시작하기</button>
+      </div>
+    </section>
+
+    <!-- Quiz -->
+    <section id="screen-quiz" class="screen">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="prog-fill" class="progress-fill"></div></div>
+        <div id="prog-num" class="progress-num">1 / 9</div>
+      </div>
+      <div class="q-card">
+        <span id="q-badge" class="q-badge">Q1</span>
+        <h2 id="q-title" class="q-title"></h2>
+      </div>
+      <div id="choices" class="choices"></div>
+      <div class="back-link" onclick="prevQuestion()">← 이전 질문으로</div>
+    </section>
+
+    <!-- Result -->
+    <section id="screen-result" class="screen">
+      <div class="res-card" id="res-card">
+        <span id="res-code" class="res-type-code"></span>
+        <img id="res-img" class="res-img" src="" alt="결과 푸딩" />
+        <h2 id="res-name" class="res-name"></h2>
+        <p id="res-quote" class="res-quote"></p>
+        <div id="res-desc" class="res-desc"></div>
+        <div class="res-grid">
+          <div class="mini-box">
+            <div class="mini-label">🎯 찰떡 입시 전형</div>
+            <div id="res-track" class="mini-val"></div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-label">🤝 환상의 공부 메이트</div>
+            <div id="res-mate" class="mini-val"></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="copyResult()">내 결과 복사해서 스토리 공유하기</button>
+          <button class="btn btn-secondary" onclick="restartQuiz()">다시 검사하기</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast">결과가 복사됐어요! 인스타 스토리에 붙여넣기 해보세요 🙌</div>
+
+  <script>
+    const QUESTIONS = [
+      // Axis 1: P (계획형) vs F (몰입/즉흥형)
+      { axis: 0, q: "독서실이나 스터디카페에 딱 앉았을 때 제일 먼저 하는 일은?", a: ["오늘 할 일·시간표를 플래너에 꼼꼼히 적고 시작한다", "P"], b: ["일단 오늘 제일 땡기는 과목 책부터 펴고 바로 풀기 시작한다", "F"] },
+      { axis: 0, q: "인강 1강을 듣다가 갑자기 밀린 복습이 생각났을 때 나는?", a: ["메모해 두고 정해진 스케줄 끝난 뒤에 복습한다", "P"], b: ["지금 안 하면 찝찝해서 바로 멈추고 그 부분부터 판다", "F"] },
+      { axis: 0, q: "시험 D-30, 나만의 공부 계획표 스타일은?", a: ["주차별·요일별 진도가 다 짜여 있어야 마음이 편하다", "P"], b: ["큰 목표만 정해 두고 그날 컨디션 따라 진도를 조절한다", "F"] },
+
+      // Axis 2: L (논리/패턴) vs I (직관/감각)
+      { axis: 1, q: "어려운 국어 비문학·영어 빈칸 문제를 풀 때 내 머릿속은?", a: ["문단 구조·선지 근거를 논리적으로 따져가며 소거한다", "L"], b: ["전체 흐름과 맥락 감각으로 답의 방향을 빠르게 잡는다", "I"] },
+      { axis: 1, q: "새 개념을 공부할 때 더 잘 머리에 남는 방식은?", a: ["왜 이런 공식/원리가 나왔는지 체계적으로 정리될 때", "L"], b: ["예시 문제나 이미지, 강사 쌤의 비유로 한눈에 와닿을 때", "I"] },
+      { axis: 1, q: "오답 노트를 만든다면 어떤 스타일?", a: ["틀린 이유·출제 포인트·함정 선지를 번호 매겨 분석한다", "L"], b: ["형광펜 색깔별로 깔끔하게 꾸미고 한 줄 요약만 남긴다", "I"] },
+
+      // Axis 3: S (안정/완벽) vs B (도전/승부사)
+      { axis: 2, q: "모의고사에서 15분 남은 시점, 킬러 1문제 vs 쉬운 2문제?", a: ["무조건 맞출 수 있는 쉬운 2문제부터 챙겨서 점수를 지킨다", "S"], b: ["이거 풀면 1등급! 승부욕 발동해서 끝까지 물고 늘어진다", "B"] },
+      { axis: 2, q: "수시·정시 원서 6장 쓸 때 나의 성향은?", a: ["안정·적정 카드 위주로 안전하게 합격선을 확보한다", "S"], b: ["상향·스나이핑 카드 1~2장은 무조건 찔러봐야 직성이 풀린다", "B"] },
+      { axis: 2, q: "시험 직전 마지막 1시간, 내가 보는 자료는?", a: ["이미 여러 번 본 익숙한 기본서·오답 노트 회독", "S"], b: ["혹시 나올지 모를 고난도 신유형·파이널 모의고사 요약", "B"] },
+    ];
+
+    const TYPES = {
+      PLS: {
+        name: "민트 푸딩 · 꼼꼼 플래너형",
+        color: "#2ce5a8",
+        img: "assets/pudding-mint.png",
+        quote: "“체크리스트 하나씩 지울 때가 제일 짜릿해”",
+        desc: "계획표의 논리적 완성도와 꾸준함이 무기인 타입! 기출 분석도 체계적으로 쌓아 올려서 시험장에서도 흔들리지 않고 제 실력을 그대로 뽑아냅니다. 다만 계획이 조금만 틀어져도 스트레스를 받기 쉬우니 주간 버퍼 데이를 하루씩 비워 두면 완벽해요.",
+        track: "학생부교과 · 정시 안정형",
+        mate: "골드 푸딩 (FLB)"
+      },
+      PLB: {
+        name: "스카이 푸딩 · 전략적 스나이퍼형",
+        color: "#58bcff",
+        img: "assets/pudding-sky.png",
+        quote: "“데이터와 배치표는 거짓말을 안 해”",
+        desc: "입시 판 전체를 체스판처럼 읽는 전략가! 환산점수·반영비·출제 패턴을 빠르게 간파해서 가성비 최고 효율로 성적을 올립니다. 과감한 상향 지원도 근거를 갖고 찌르는 타입이라 원서 영역에서 빛을 발해요.",
+        track: "정시 가·나·다군 스나이핑",
+        mate: "핑크 푸딩 (FIS)"
+      },
+      PIS: {
+        name: "크림 푸딩 · 성실 루틴 마스터형",
+        color: "#f5e8c4",
+        img: "assets/pudding-cream.png",
+        quote: "“오늘도 독서실 1등 출석 완료”",
+        desc: "매일 같은 시간에 앉아 묵묵히 루틴을 지켜내는 외유내강 타입! 감각과 꾸준함을 동시에 챙겨서 내신·수능 모두 기복이 가장 적습니다. 주변 분위기에 휩쓸리지 않고 끝까지 완주하는 힘이 대단해요.",
+        track: "학생부종합 · 내신 꾸준형",
+        mate: "코랄 푸딩 (FIB)"
+      },
+      PIB: {
+        name: "라벤더 푸딩 · 영감형 멀티플레이어",
+        color: "#b08cff",
+        img: "assets/pudding-lavender.png",
+        quote: "“꽂히면 밤새고 논술·면접까지 뚫음”",
+        desc: "계획적인 틀 안에서도 자기만의 창의적인 해석을 얹을 줄 아는 타입! 남들이 못 보는 제시문 연결고리를 잘 찾아내서 면접이나 논술, 세특 탐구에서 유독 강한 모습을 보입니다.",
+        track: "학생부종합 · 서류/면접 강자",
+        mate: "에메랄드 푸딩 (FLS)"
+      },
+      FLS: {
+        name: "에메랄드 푸딩 · 개념 집착 장인형",
+        color: "#22c680",
+        img: "assets/pudding-emerald.png",
+        quote: "“이 문제 원리 이해될 때까지 절대 안 넘어가”",
+        desc: "대충 외우는 걸 못 참고 본질이 납득될 때까지 파고드는 학자 스타일! 초반 속도는 느려 보여도, 한 번 뚫어 놓은 과목은 1등급에서 절대 내려오지 않는 단단한 실력을 만듭니다.",
+        track: "수리·과학 논술 · 1등급 굳히기",
+        mate: "라벤더 푸딩 (PIB)"
+      },
+      FLB: {
+        name: "골드 푸딩 · 킬러문항 사냥꾼형",
+        color: "#ffce40",
+        img: "assets/pudding-gold.png",
+        quote: "“쉬운 건 컷, 30번 뚫을 때 도파민 폭발”",
+        desc: "고난도 킬러 문제를 만났을 때 오히려 눈이 반짝이는 승부사! 시간 제한 압박 속에서도 논리적인 돌파구를 잘 찾아냅니다. 다만 쉬운 2~3점 실수만 조심하면 최상위권 직행이에요.",
+        track: "의치한약수 · 최상위권 정시",
+        mate: "민트 푸딩 (PLS)"
+      },
+      FIS: {
+        name: "핑크 푸딩 · 감성 몰입 아티스트형",
+        color: "#ff84b2",
+        img: "assets/pudding-pink.png",
+        quote: "“예쁜 필기랑 내 페이스만 지켜주면 완벽해”",
+        desc: "공부 환경·필기·리듬이 딱 맞을 때 무서운 집중력을 발휘하는 타입! 국어 문학·영어·탐구처럼 맥락과 감각이 중요한 과목에서 유독 강점을 보입니다. 나만의 애착 펜과 플레이리스트가 최고의 무기!",
+        track: "예체능 · 인문/어문 · 국어강점",
+        mate: "스카이 푸딩 (PLB)"
+      },
+      FIB: {
+        name: "코랄 푸딩 · 벼락치기 각성 천재형",
+        color: "#ff765e",
+        img: "assets/pudding-coral.png",
+        quote: "“디데이 다가올수록 두뇌 회전 300%”",
+        desc: "평소엔 여유로워 보여도 마감·시험이 코앞에 닥치면 초인적인 순발력이 터지는 타입! 짧은 시간 안에 핵심만 쏙 뽑아내는 직관력이 뛰어나서 모의고사 역전 드라마의 주인공이 되기 쉽습니다.",
+        track: "단기 집중 논술 · 막판 역전형",
+        mate: "크림 푸딩 (PIS)"
+      }
+    };
+
+    let idx = 0;
+    let scores = [0, 0, 0]; // >0 = P/L/S, <0 = F/I/B
+    let history = [];
+    let currentCode = "PLS";
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function startQuiz() {
+      idx = 0; scores = [0, 0, 0]; history = [];
+      renderQ();
+      show('screen-quiz');
+    }
+
+    function renderQ() {
+      const q = QUESTIONS[idx];
+      document.getElementById('prog-fill').style.width = `${((idx + 1) / QUESTIONS.length) * 100}%`;
+      document.getElementById('prog-num').innerText = `${idx + 1} / ${QUESTIONS.length}`;
+      document.getElementById('q-badge').innerText = `QUESTION ${idx + 1}`;
+      document.getElementById('q-title').innerText = q.q;
+      const box = document.getElementById('choices');
+      box.innerHTML = '';
+      [q.a, q.b].forEach(([txt, side]) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = txt;
+        btn.onclick = () => pick(q.axis, side);
+        box.appendChild(btn);
+      });
+    }
+
+    function pick(axis, side) {
+      const delta = (side === 'P' || side === 'L' || side === 'S') ? 1 : -1;
+      scores[axis] += delta;
+      history.push({ axis, delta });
+      if (idx + 1 < QUESTIONS.length) {
+        idx++;
+        renderQ();
+      } else {
+        showResult();
+      }
+    }
+
+    function prevQuestion() {
+      if (idx === 0) { show('screen-intro'); return; }
+      const last = history.pop();
+      if (last) scores[last.axis] -= last.delta;
+      idx--;
+      renderQ();
+    }
+
+    function showResult() {
+      const c0 = scores[0] >= 0 ? 'P' : 'F';
+      const c1 = scores[1] >= 0 ? 'L' : 'I';
+      const c2 = scores[2] >= 0 ? 'S' : 'B';
+      currentCode = c0 + c1 + c2;
+      const t = TYPES[currentCode];
+
+      const badge = document.getElementById('res-code');
+      badge.innerText = `${currentCode} TYPE`;
+      badge.style.background = `${t.color}22`;
+      badge.style.color = t.color;
+      badge.style.border = `1px solid ${t.color}66`;
+
+      document.getElementById('res-card').style.borderColor = `${t.color}55`;
+      document.getElementById('res-img').src = t.img;
+      document.getElementById('res-name').innerText = t.name;
+      document.getElementById('res-quote').innerText = t.quote;
+      document.getElementById('res-desc').innerText = t.desc;
+      document.getElementById('res-track').innerText = t.track;
+      document.getElementById('res-mate').innerText = t.mate;
+      show('screen-result');
+    }
+
+    function copyResult() {
+      const t = TYPES[currentCode];
+      const msg = `[입시먹방 공부 적성 MBTI] 내 결과는 '${t.name}' (${currentCode})!\n${t.quote}\n🎯 추천 전형: ${t.track}\n@ipsi.bite 프로필 링크에서 너도 해봐!`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(msg);
+      }
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    function restartQuiz() { startQuiz(); }
+  </script>
+</body>
+</html>
