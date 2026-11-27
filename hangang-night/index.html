@@ -1250,7 +1250,8 @@ function duckAsmr(duck) {
   const g = Asmr.master.gain;
   g.cancelScheduledValues(now);
   g.setValueAtTime(Math.max(g.value, 0.0001), now);
-  g.linearRampToValueAtTime(!duck && Asmr.on ? 0.34 : 0.08, now + 0.35);
+  const target = Asmr.on ? (duck ? 0.08 : 0.34) : 0.0001;
+  g.linearRampToValueAtTime(target, now + 0.35);
 }
 
 function playPreview() {
