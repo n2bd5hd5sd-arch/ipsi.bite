@@ -56,11 +56,13 @@
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;mask-composite:exclude;}
   .card-head{display:flex;align-items:center;gap:12px}
-  .disc{width:46px;height:46px;border-radius:50%;flex:0 0 auto;position:relative;display:grid;place-items:center;
+  .disc{width:46px;height:46px;border-radius:12px;flex:0 0 auto;position:relative;display:grid;place-items:center;overflow:hidden;
     background:conic-gradient(from 0deg,#2a3550,#4d5f86,#2a3550,#4d5f86,#2a3550);
-    box-shadow:inset 0 0 0 6px rgba(8,12,22,.75), 0 0 18px rgba(120,160,220,.16);
-    animation:spin 6s linear infinite}
+    box-shadow:inset 0 0 0 3px rgba(8,12,22,.75), 0 0 18px rgba(120,160,220,.16);
+    background-size:cover;background-position:center}
+  .disc:not(.has-art){border-radius:50%;animation:spin 6s linear infinite;box-shadow:inset 0 0 0 6px rgba(8,12,22,.75), 0 0 18px rgba(120,160,220,.16)}
   .disc::after{content:"";width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ffe6b0,#c08a3c)}
+  .disc.has-art::after{display:none}
   .card-meta{flex:1;min-width:0}
   .card-kicker{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.16em;color:var(--amber);text-transform:uppercase}
   .eq{display:inline-flex;gap:2px;align-items:flex-end;height:10px}
@@ -74,19 +76,36 @@
   .card-artist{margin-top:3px;font-size:12.5px;color:var(--mint);letter-spacing:.04em}
   .card-note{margin:11px 0 0;font-size:13px;line-height:1.55;color:rgba(238,243,255,.8);font-style:italic;word-break:keep-all}
   .card-note::before{content:"“"}.card-note::after{content:"”"}
-  .card-actions{display:flex;gap:8px;margin-top:14px}
-  .yt{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:44px;border-radius:14px;
-    background:linear-gradient(135deg,#ffe0b0,#ffc178);color:#2a1a05;font-size:13.5px;font-weight:800;
-    text-decoration:none;box-shadow:0 8px 22px rgba(255,180,94,.22);transition:transform .15s ease, filter .15s ease}
-  .yt:active{transform:scale(.97)}
-  .yt:hover{filter:brightness(1.05)}
-  .like{min-width:86px;height:44px;border-radius:14px;border:1px solid rgba(255,150,180,.3);
-    background:rgba(255,120,160,.1);color:#ffd3e0;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+  .card-actions{display:flex;gap:8px;margin-top:12px}
+  .yt2{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;border-radius:13px;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(238,243,255,.85);
+    font-size:12px;font-weight:600;text-decoration:none;transition:background .2s ease}
+  .yt2:hover{background:rgba(255,255,255,.12)}
+  .like{min-width:80px;height:40px;border-radius:13px;border:1px solid rgba(255,150,180,.3);
+    background:rgba(255,120,160,.1);color:#ffd3e0;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
     transition:transform .15s ease,background .2s ease}
   .like:active{transform:scale(.95)}
   .like.on{background:rgba(255,110,155,.22);border-color:rgba(255,140,180,.6);color:#fff}
   .like.pop{animation:pop .42s cubic-bezier(.2,1.6,.4,1)}
   .heart{font-size:15px;line-height:1}
+
+  /* ---------- 30s preview player ---------- */
+  .player{display:flex;align-items:center;gap:11px;margin-top:13px;padding:10px 12px;border-radius:15px;
+    background:linear-gradient(135deg, rgba(255,212,155,.13), rgba(255,212,155,.04));
+    border:1px solid rgba(255,212,155,.24)}
+  .player.hidden{display:none}
+  .play{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;flex:0 0 auto;font-size:13px;
+    background:linear-gradient(135deg,#ffe6bd,#ffbd6b);color:#2a1a05;display:grid;place-items:center;
+    box-shadow:0 6px 16px rgba(255,170,80,.25);transition:transform .15s ease}
+  .play:active{transform:scale(.92)}
+  .player-main{flex:1;min-width:0}
+  .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.16);position:relative;cursor:pointer;overflow:hidden}
+  .bar:focus-visible{outline:2px solid rgba(255,212,155,.6);outline-offset:3px}
+  .bar-fill{position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:3px;background:linear-gradient(90deg,#ffd9a2,#ffb45e)}
+  .player-foot{display:flex;justify-content:space-between;margin-top:6px;font-size:10px;letter-spacing:.05em;color:var(--faint)}
+  .player-foot #playState{color:var(--amber)}
+  .no-preview{display:none;margin-top:12px;font-size:11.5px;color:var(--faint);text-align:center}
+  .no-preview.show{display:block}
 
   /* ---------- dock ---------- */
   .dock{position:fixed;z-index:6;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
@@ -142,6 +161,26 @@
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .wide{width:100%;margin-top:4px}
   .form-note{font-size:11px;color:var(--faint);text-align:center;margin:2px 0 0;line-height:1.5}
+
+  /* ---------- song search ---------- */
+  .search-row{display:flex;gap:9px;align-items:center;margin:-2px 0 0}
+  .search-btn{flex:0 0 auto;height:40px;padding:0 14px;border-radius:12px;cursor:pointer;font-family:inherit;
+    border:1px solid rgba(255,212,155,.35);background:rgba(255,212,155,.12);color:var(--amber);font-size:12.5px;font-weight:700}
+  .search-btn:active{transform:scale(.97)}
+  .search-btn[disabled]{opacity:.6;cursor:default}
+  .search-note{font-size:10.5px;line-height:1.45;color:var(--faint)}
+  .search-note b{color:var(--amber);font-weight:700}
+  .results{display:grid;gap:6px;max-height:200px;overflow:auto;-webkit-overflow-scrolling:touch;margin-top:2px}
+  .results:empty{display:none}
+  .res{display:flex;align-items:center;gap:10px;width:100%;padding:7px;border-radius:12px;cursor:pointer;text-align:left;
+    border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:inherit;font-family:inherit;
+    transition:border-color .2s ease,background .2s ease}
+  .res img{width:40px;height:40px;border-radius:8px;object-fit:cover;flex:0 0 auto;background:#1a2233}
+  .res .r-i{min-width:0}
+  .res .r-t{display:block;font-size:12.5px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res .r-a{display:block;font-size:10.5px;color:var(--faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res.sel{border-color:rgba(255,212,155,.6);background:rgba(255,212,155,.13)}
+  .res-status{font-size:11.5px;line-height:1.5;color:var(--faint);padding:6px 2px}
 
   /* ---------- toast ---------- */
   .toast{position:fixed;z-index:20;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);transform:translate(-50%,14px);
@@ -211,13 +250,21 @@
   <h3 class="card-song" id="cardSong">밤편지</h3>
   <div class="card-artist" id="cardArtist">아이유</div>
   <p class="card-note" id="cardNote">자정이 넘어도 강바람은 안 자더라</p>
+  <div class="player" id="player">
+    <button class="play" id="playBtn" aria-label="30초 미리듣기 재생"><span id="playIcon">▶</span></button>
+    <div class="player-main">
+      <div class="bar" id="bar" role="slider" aria-label="재생 위치" tabindex="0"><div class="bar-fill" id="barFill"></div></div>
+      <div class="player-foot"><span id="playState">30초 미리듣기</span><span id="playTime">0:00 / 0:30</span></div>
+    </div>
+  </div>
+  <div class="no-preview" id="noPreview">이 곡은 미리듣기가 아직 연결되지 않았어요</div>
   <div class="card-actions">
-    <a class="yt" id="ytLink" target="_blank" rel="noopener noreferrer">▶ 유튜브로 듣기</a>
+    <a class="yt2" id="ytLink" target="_blank" rel="noopener noreferrer">유튜브에서 전체 듣기 ↗</a>
     <button class="like" id="likeBtn"><span class="heart" id="likeIcon">♡</span><span id="likeCount">0</span></button>
   </div>
 </section>
 
-<div class="hint" id="hint">터치해서 둘러보고 · 돗자리를 눌러보세요</div>
+<div class="hint" id="hint">터치해서 둘러보고 · 돗자리를 누르면 30초 미리듣기</div>
 
 <div class="dock">
   <button class="btn asmr" id="asmrBtn" aria-pressed="false" title="밤 한강 ASMR"><span>🎧</span><em>ASMR</em></button>
@@ -243,6 +290,11 @@
       <span>아티스트</span>
       <input id="fArtist" maxlength="30" placeholder="예: 아이유" autocomplete="off" required />
     </label>
+    <div class="search-row">
+      <button type="button" class="search-btn" id="songSearch">🔍 곡 검색</button>
+      <span class="search-note">찾으면 <b>30초 미리듣기</b>까지 같이 연결돼요</span>
+    </div>
+    <div class="results" id="searchResults"></div>
     <label class="field">
       <span>한 줄 기분</span>
       <textarea id="fNote" maxlength="60" rows="2" placeholder="예: 자정이 넘어도 강바람은 안 자더라"></textarea>
@@ -288,6 +340,29 @@ const STORE = {
   likes: 'hangangNight.v1.likes',
   liked: 'hangangNight.v1.liked'
 };
+
+/* 30초 미리듣기: iTunes Search API로 실제 곡을 조회해 둔 값 (2026-11-27 기준) */
+const PREVIEWS = {
+  m01: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5a/43/d5/5a43d5c0-8b9a-2a91-dd9c-405bfd51b82f/mzaf_2888874735741039485.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/dc/12/fe/dc12fe03-172b-a843-0d96-12819fa05b6c/cover-.jpg/300x300bb.jpg', itunes:'IU – Through the Night' },
+  m02: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/18/a3/3b/18a33b0c-9bb7-4db4-5d99-93495815ba67/mzaf_13644385033728356274.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/f1/7d/f9/f17df9f4-af09-d19a-fc93-afeea02ad10e/738676855999_Cover.jpg/300x300bb.jpg', itunes:'Yerin Baek – Across the universe' },
+  m03: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b1/a4/0a/b1a40a3e-65ca-f51b-3bb9-12145d970895/mzaf_509885747699732949.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/a9/b2/fca9b2d4-b1ed-92e8-2e5f-1838d77cbce7/cover-_NEW.jpg/300x300bb.jpg', itunes:'JANNABI – For Lovers Who Hesitate' },
+  m04: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ac/3a/56/ac3a56f8-d0b4-900c-5be7-c9d2ec4e6e92/mzaf_18435708929100952232.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/be/ce/5c/bece5cff-2caf-6d8a-9c21-3035537d2a4d/Album_cover_1400X1400.jpg/300x300bb.jpg', itunes:'The Black Skirts – EVERYTHING' },
+  m05: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/9f/51/3d9f5119-3d35-fd65-374d-d2db8127214f/mzaf_12305961986614200595.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/83/df/34/83df34b0-ab7d-7257-668a-7692f68fdc7a/5055946710525.jpg/300x300bb.jpg', itunes:'10CM – Stalker' },
+  m06: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/da/00/29/da0029b4-e181-857b-cfaf-489de6999020/mzaf_1580396445101899353.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/8e/a2/d0/8ea2d001-0b52-a451-4a7c-de35d3502155/00602547860828.rgb.jpg/300x300bb.jpg', itunes:'DEAN – D (Half Moon)' },
+  m07: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ff/96/0a/ff960a41-1d20-ce31-0943-7559cecde893/mzaf_1644908721555142325.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d3/4c/1c/d34c1cf3-0d36-df1e-c9a3-c0d16faf8c3f/8804775092534.jpg/300x300bb.jpg', itunes:'BOL4 – Travel' },
+  m08: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/41/e2/d1/41e2d146-6b36-94b7-9fab-527adc117622/mzaf_15100695928980147311.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/55/92/c4/5592c4a2-fe72-2302-0edb-0133f4548abb/8809534461279_Cover.jpg/300x300bb.jpg', itunes:'Crush – Beautiful' },
+  m09: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/14/16/55/1416558a-2bc2-a6a3-6943-cbb7bb61709d/mzaf_5601978480163855394.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e4/a2/80/e4a28015-490b-255a-ff26-aadd6257cfa1/AKMU_DS.jpg/300x300bb.jpg', itunes:'AKMU – How can I love the heartbreak' }
+};
+MATS.forEach(m => { const p = PREVIEWS[m.id]; if (p) Object.assign(m, p); });
 
 const readJSON = (k, fallback) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } };
 const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -1148,6 +1223,112 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+/* ---------- iTunes 30초 미리듣기 플레이어 ---------- */
+const audio = new Audio();
+audio.preload = 'none';
+let audioMatId = null;
+
+const mmss = s => { if (!isFinite(s) || s < 0) s = 0; return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
+
+function setPlaying(playing) {
+  $('playIcon').textContent = playing ? '❚❚' : '▶';
+  $('playBtn').setAttribute('aria-label', playing ? '미리듣기 일시정지' : '30초 미리듣기 재생');
+  $('playState').textContent = playing ? '재생 중 · iTunes 30초' : 'iTunes 30초 미리듣기';
+}
+
+function updateProgress() {
+  const d = audio.duration || 30;
+  const p = Math.min(1, Math.max(0, audio.currentTime / d));
+  $('barFill').style.width = (p * 100).toFixed(1) + '%';
+  $('playTime').textContent = mmss(audio.currentTime) + ' / ' + mmss(d);
+}
+
+/* 미리듣기가 나오는 동안 ASMR은 잠잠해지고, 끝나면 돌아온다 */
+function duckAsmr(duck) {
+  if (!Asmr.ctx || !Asmr.master) return;
+  const now = Asmr.ctx.currentTime;
+  const g = Asmr.master.gain;
+  g.cancelScheduledValues(now);
+  g.setValueAtTime(Math.max(g.value, 0.0001), now);
+  g.linearRampToValueAtTime(!duck && Asmr.on ? 0.34 : 0.08, now + 0.35);
+}
+
+function playPreview() {
+  if (!audioMatId) return;
+  audio.play().then(() => { setPlaying(true); duckAsmr(true); }).catch(() => { setPlaying(false); duckAsmr(false); });
+}
+
+function pausePreview() {
+  audio.pause();
+  setPlaying(false);
+  duckAsmr(false);
+}
+
+function setupPreview(rec) {
+  const has = !!rec.preview;
+  $('player').classList.toggle('hidden', !has);
+  $('noPreview').classList.toggle('show', !has);
+  if (!has) {
+    audio.pause();
+    audioMatId = null;
+    try { audio.removeAttribute('src'); } catch (e) {}
+    setPlaying(false);
+    $('barFill').style.width = '0%';
+    $('playTime').textContent = '0:00 / 0:30';
+    $('noPreview').textContent = '이 곡은 미리듣기가 아직 연결되지 않았어요 · 유튜브에서 들어보세요';
+    return;
+  }
+  if (audioMatId !== rec.id) {
+    audio.pause();
+    audioMatId = rec.id;
+    audio.src = rec.preview;
+    try { audio.currentTime = 0; } catch (e) {}
+    $('barFill').style.width = '0%';
+    $('playTime').textContent = '0:00 / 0:30';
+    setPlaying(false);
+  }
+}
+
+function setDiscArt(rec) {
+  const disc = $('cardDisc');
+  if (rec.art) {
+    disc.style.backgroundImage = 'url("' + rec.art + '")';
+    disc.classList.add('has-art');
+  } else {
+    disc.style.backgroundImage = '';
+    disc.classList.remove('has-art');
+  }
+}
+
+$('playBtn').addEventListener('click', () => {
+  if (!audioMatId) return;
+  if (audio.paused) playPreview(); else pausePreview();
+});
+
+$('bar').addEventListener('click', e => {
+  if (!audio.duration) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const p = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  audio.currentTime = p * audio.duration;
+  updateProgress();
+});
+
+audio.addEventListener('timeupdate', updateProgress);
+audio.addEventListener('loadedmetadata', updateProgress);
+audio.addEventListener('ended', () => {
+  setPlaying(false);
+  duckAsmr(false);
+  audio.currentTime = 0;
+  $('barFill').style.width = '0%';
+  $('playTime').textContent = '0:00 / ' + mmss(audio.duration || 30);
+});
+audio.addEventListener('error', () => {
+  if (!audioMatId) return;
+  setPlaying(false);
+  duckAsmr(false);
+  toast('미리듣기를 불러오지 못했어요 · 유튜브로 들어봐요');
+});
+
 function findMat(id) {
   if (myMatRecord && myMatRecord.id === id) return myMatRecord;
   return MATS.find(m => m.id === id);
@@ -1162,12 +1343,36 @@ function openCard(id) {
   $('cardArtist').textContent = rec.artist;
   $('cardNote').textContent = rec.note || '아무 말 없이, 노래만';
   $('ytLink').href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(rec.song + ' ' + rec.artist);
+  setDiscArt(rec);
   updateLikeUI(id);
+  setupPreview(rec);
   card.classList.add('show');
   matGroups.forEach(g => {
     const on = g.userData.matId === id;
     g.userData.ring.material.opacity = on ? 0.55 : 0;
   });
+  if (rec.preview) playPreview();
+  else autoAttachPreview(rec, id);
+}
+
+/* 미리듣기가 없는 내 돗자리는 iTunes에서 한 번 찾아본다 */
+async function autoAttachPreview(rec, id) {
+  if (id === selectedId) $('noPreview').textContent = '미리듣기를 찾는 중…';
+  const list = await itunesSearch((rec.song + ' ' + rec.artist).trim(), 5);
+  if (!list.length) {
+    if (id === selectedId) $('noPreview').textContent = '이 곡은 미리듣기가 없어요 · 유튜브로 들어보세요';
+    return;
+  }
+  const top = list[0];
+  rec.preview = top.previewUrl;
+  rec.art = (top.artworkUrl100 || '').replace('100x100bb', '300x300bb');
+  rec.itunes = (top.artistName || '') + ' – ' + (top.trackName || '');
+  if (rec.id === 'my-mat' && myMatRecord && myMatRecord.id === 'my-mat') {
+    myMatRecord.preview = rec.preview;
+    myMatRecord.art = rec.art;
+    writeJSON(STORE.mat, myMatRecord);
+  }
+  if (id === selectedId) { setDiscArt(rec); setupPreview(rec); playPreview(); }
 }
 
 function updateLikeUI(id) {
@@ -1182,6 +1387,7 @@ function closeCard() {
   selectedId = null;
   card.classList.remove('show');
   matGroups.forEach(g => g.userData.ring.material.opacity = 0);
+  pausePreview();
 }
 
 $('cardClose').addEventListener('click', closeCard);
@@ -1204,14 +1410,89 @@ $('likeBtn').addEventListener('click', () => {
   updateLikeUI(selectedId);
 });
 
+/* ---------- iTunes 곡 검색 ---------- */
+let picked = null;
+const itunesCache = new Map();
+
+async function itunesSearch(term, limit) {
+  const key = term.toLowerCase() + '|' + (limit || 6);
+  if (itunesCache.has(key)) return itunesCache.get(key);
+  /* 한국 스토어가 비어 있으면 미국·일본 스토어로 넘어간다 */
+  for (const store of ['KR', 'US', 'JP']) {
+    try {
+      const res = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(term) +
+        '&entity=song&limit=' + (limit || 6) + '&country=' + store);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const list = (data.results || []).filter(r => r.previewUrl);
+      if (list.length) { itunesCache.set(key, list); return list; }
+    } catch (e) { /* 다음 스토어 시도 */ }
+  }
+  itunesCache.set(key, []);
+  return [];
+}
+
+function renderResults(list) {
+  const box = $('searchResults');
+  box.innerHTML = '';
+  if (!list.length) {
+    const d = document.createElement('div');
+    d.className = 'res-status';
+    d.textContent = '검색 결과가 없어요. 그대로 저장하면 유튜브 링크로만 들을 수 있어요.';
+    box.appendChild(d);
+    return;
+  }
+  list.slice(0, 5).forEach(r => {
+    const art = (r.artworkUrl100 || '').replace('100x100bb', '300x300bb');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'res';
+    const img = document.createElement('img');
+    img.src = art; img.alt = ''; img.loading = 'lazy';
+    const wrap = document.createElement('span');
+    wrap.className = 'r-i';
+    const t = document.createElement('span'); t.className = 'r-t'; t.textContent = r.trackName || '';
+    const a = document.createElement('span'); a.className = 'r-a';
+    a.textContent = (r.artistName || '') + (r.collectionName ? ' · ' + r.collectionName : '');
+    wrap.appendChild(t); wrap.appendChild(a);
+    b.appendChild(img); b.appendChild(wrap);
+    b.addEventListener('click', () => {
+      picked = { preview: r.previewUrl, art, song: r.trackName || '', artist: r.artistName || '' };
+      $('fSong').value = r.trackName || '';
+      $('fArtist').value = r.artistName || '';
+      [...box.querySelectorAll('.res')].forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      toast('30초 미리듣기를 연결했어요 🎧');
+    });
+    box.appendChild(b);
+  });
+}
+
+$('songSearch').addEventListener('click', async () => {
+  const q = ($('fSong').value.trim() + ' ' + $('fArtist').value.trim()).trim();
+  if (q.length < 2) { toast('곡 제목이나 아티스트를 먼저 적어줘요'); return; }
+  const btn = $('songSearch');
+  $('searchResults').innerHTML = '<div class="res-status">iTunes에서 찾는 중…</div>';
+  btn.disabled = true;
+  const list = await itunesSearch(q, 6);
+  btn.disabled = false;
+  renderResults(list);
+});
+
 /* sheet */
 function openSheet() {
   const rec = myMatRecord;
+  $('searchResults').innerHTML = '';
+  picked = null;
   if (rec) {
     $('fNick').value = rec.nick;
     $('fSong').value = rec.song;
     $('fArtist').value = rec.artist;
     $('fNote').value = rec.note || '';
+    if (rec.preview) {
+      picked = { preview: rec.preview, art: rec.art || '', song: rec.song, artist: rec.artist };
+      $('searchResults').innerHTML = '<div class="res-status">✓ 30초 미리듣기가 연결돼 있어요</div>';
+    }
   }
   sheet.classList.add('show');
   scrim.classList.add('show');
@@ -1246,12 +1527,16 @@ $('matForm').addEventListener('submit', e => {
   if (!nick || !song || !artist) { toast('닉네임, 곡, 아티스트를 채워줘요'); return; }
 
   const isFirst = !myMatRecord;
+  const sameSong = myMatRecord && myMatRecord.song === song && myMatRecord.artist === artist;
+  const usePreview = (picked && picked.song === song && picked.artist === artist) ? picked : null;
   const rec = {
     id: 'my-mat',
     nick: nick.slice(0, 12),
     song: song.slice(0, 40),
     artist: artist.slice(0, 30),
     note: note.slice(0, 60),
+    preview: usePreview ? usePreview.preview : (sameSong ? (myMatRecord.preview || '') : ''),
+    art: usePreview ? usePreview.art : (sameSong ? (myMatRecord.art || '') : ''),
     x: isFirst ? -2.4 : myMatRecord.x,
     z: isFirst ? 9.2 : myMatRecord.z,
     rot: isFirst ? -0.06 : myMatRecord.rot,
