@@ -2492,12 +2492,17 @@ function renderSoundUI() {
    ========================================================== */
 async function loadThree() {
   const urls = [
-    'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js',
-    'https://unpkg.com/three@0.160.0/build/three.module.js'
+    'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js',
+    'https://unpkg.com/three@0.160.0/build/three.module.min.js'
   ];
   let err = null;
   for (const u of urls) {
-    try { return await import(u); } catch (e) { err = e; }
+    try {
+      return await Promise.race([
+        import(u),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('cdn timeout')), 12000))
+      ]);
+    } catch (e) { err = e; }
   }
   throw err || new Error('three');
 }
@@ -2643,6 +2648,9 @@ async function boot() {
   }
 
   try {
+    setTimeout(() => {
+      if (!renderer) $('#loaderMsg').textContent = '3D를 내려받는 중이에요 · 네트워크가 느리면 조금 걸릴 수 있어요';
+    }, 5000);
     THREE = await loadThree();
   } catch (e) {
     loaderFail('3D 라이브러리를 불러오지 못했어요. 네트워크를 확인하고 다시 시도해 주세요.');
