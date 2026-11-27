@@ -307,12 +307,12 @@ const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x081021, 0.0028);
 
 const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 2000);
-const START = { pos: new THREE.Vector3(0, 8.6, 23), target: new THREE.Vector3(0, 1.6, -6) };
+const START = { pos: new THREE.Vector3(0, 10, 27), target: new THREE.Vector3(0, 2.2, -16) };
 
 function fitCamera() {
   const aspect = window.innerWidth / window.innerHeight;
   const portrait = aspect < 0.85;
-  camera.fov = portrait ? 70 : 54;
+  camera.fov = portrait ? 68 : 52;
   camera.aspect = aspect;
   camera.updateProjectionMatrix();
   return portrait;
@@ -406,10 +406,10 @@ const sky = new THREE.Mesh(
   new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false,
     uniforms: {
-      uTop:    { value: new THREE.Color(0x030611) },
-      uMid:    { value: new THREE.Color(0x0a1730) },
-      uHorizon:{ value: new THREE.Color(0x1d3355) },
-      uWarm:   { value: new THREE.Color(0x4a3a34) }
+      uTop:    { value: new THREE.Color(0x040717) },
+      uMid:    { value: new THREE.Color(0x0c1c3a) },
+      uHorizon:{ value: new THREE.Color(0x27405f) },
+      uWarm:   { value: new THREE.Color(0x6a4a38) }
     },
     vertexShader: `varying vec3 vPos; void main(){ vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
     fragmentShader: `
@@ -442,7 +442,7 @@ let starMat = null;
     pos[i*3]   = Math.cos(theta) * r * R;
     pos[i*3+1] = y * R + 10;
     pos[i*3+2] = Math.sin(theta) * r * R;
-    size[i] = 0.8 + Math.pow(Math.random(), 3) * 5.2;
+    size[i] = 1.2 + Math.pow(Math.random(), 2.6) * 6.0;
     phase[i] = Math.random() * 6.283;
     c.setHSL(0.55 + Math.random() * 0.12, 0.35, 0.72 + Math.random() * 0.25);
     tint[i*3] = c.r; tint[i*3+1] = c.g; tint[i*3+2] = c.b;
@@ -473,7 +473,7 @@ let starMat = null;
         vec2 d = gl_PointCoord - 0.5;
         float r = length(d);
         float core = smoothstep(0.5, 0.0, r);
-        float a = pow(core, 2.2) * vAlpha;
+        float a = pow(core, 1.6) * vAlpha;
         if (a < 0.01) discard;
         gl_FragColor = vec4(vTint, a);
       }`
@@ -485,7 +485,7 @@ let starMat = null;
 })();
 
 /* moon */
-const MOON = new THREE.Vector3(46, 96, -330);
+const MOON = new THREE.Vector3(52, 78, -320);
 const moonMesh = new THREE.Mesh(
   new THREE.SphereGeometry(9, 32, 24),
   new THREE.MeshBasicMaterial({ color: 0xfff4d6 })
@@ -606,7 +606,7 @@ const waterUniforms = {
   uTime:  { value: 0 },
   uDeep:  { value: new THREE.Color(0x08182e) },
   uShallow:{ value: new THREE.Color(0x0d2a44) },
-  uMoonX: { value: 0.628 },
+  uMoonX: { value: 0.624 },
   uMoonColor: { value: new THREE.Color(0xdfe8ff) }
 };
 const water = new THREE.Mesh(
@@ -674,13 +674,13 @@ scene.add(water);
 
 /* glints: additive reflection streaks under the moon and bridge */
 const glints = [];
-function addGlint({ x, z, w, d, color, opacity, speed }) {
+function addGlint({ x, z, w, d, color, opacity, speed, repeat }) {
   const mat = new THREE.MeshBasicMaterial({
     map: STREAK_TEX.clone(), color, transparent: true, opacity,
     blending: THREE.AdditiveBlending, depthWrite: false
   });
   mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
-  mat.map.repeat.set(1, 1.6);
+  mat.map.repeat.set(repeat || 1, 1.6);
   mat.map.needsUpdate = true;
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat);
   mesh.rotation.x = -Math.PI / 2;
@@ -689,9 +689,9 @@ function addGlint({ x, z, w, d, color, opacity, speed }) {
   glints.push({ mesh, mat, base: opacity, speed, phase: Math.random() * 6.28 });
   return mesh;
 }
-addGlint({ x: 43, z: -70, w: 26, d: 105, color: 0xcfe0ff, opacity: 0.55, speed: 0.55 });
-addGlint({ x: 60, z: -50, w: 12, d: 70, color: 0xbcd2ff, opacity: 0.35, speed: 0.4 });
-addGlint({ x: -46, z: -60, w: 34, d: 120, color: 0xffbf7a, opacity: 0.5, speed: 0.8 });
+addGlint({ x: 47, z: -72, w: 22, d: 130, color: 0xcfe0ff, opacity: 0.62, speed: 0.55, repeat: 1 });
+addGlint({ x: 56, z: -60, w: 9, d: 90, color: 0xbcd2ff, opacity: 0.4, speed: 0.4, repeat: 1 });
+addGlint({ x: 0, z: -150, w: 330, d: 46, color: 0xffb877, opacity: 0.5, speed: 0.9, repeat: 18 });
 
 /* =========================================================
    7. far bank: hills, city skyline, N Seoul Tower
@@ -699,41 +699,66 @@ addGlint({ x: -46, z: -60, w: 34, d: 120, color: 0xffbf7a, opacity: 0.5, speed: 
 const farGroup = new THREE.Group();
 scene.add(farGroup);
 
-const hillMat = new THREE.MeshStandardMaterial({ color: 0x070d16, roughness: 1, metalness: 0 });
-for (let i = 0; i < 14; i++) {
-  const s = 60 + Math.random() * 130;
+/* warm light-pollution glow sitting on the far bank */
+(function horizonGlow() {
+  for (const cfg of [
+    { z: -262, y: 14, w: 620, h: 190, c: 0xff8a4a, o: 0.16 },
+    { z: -252, y: 4, w: 420, h: 90, c: 0xffb070, o: 0.12 }
+  ]) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w, cfg.h), new THREE.MeshBasicMaterial({
+      map: GLOW_TEX, color: cfg.c, transparent: true, opacity: cfg.o,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    }));
+    m.position.set(0, cfg.y, cfg.z);
+    farGroup.add(m);
+  }
+})();
+
+const hillMat = new THREE.MeshStandardMaterial({ color: 0x081120, roughness: 1, metalness: 0 });
+for (let i = 0; i < 13; i++) {
+  const s = 70 + Math.random() * 120;
   const hill = new THREE.Mesh(new THREE.SphereGeometry(s, 16, 12), hillMat);
-  hill.scale.y = 0.24 + Math.random() * 0.16;
-  hill.position.set(-280 + i * 44 + Math.random() * 20, -s * 0.18, -260 - Math.random() * 90);
+  hill.scale.y = 0.22 + Math.random() * 0.18;
+  hill.position.set(-300 + i * 50 + Math.random() * 20, -s * 0.42, -300 - Math.random() * 80);
   farGroup.add(hill);
 }
 
+/* the far land mass, so the city does not float on the water */
+(function bank() {
+  const b = new THREE.Mesh(new THREE.BoxGeometry(600, 5, 46), new THREE.MeshStandardMaterial({ color: 0x0b1424, roughness: 1 }));
+  b.position.set(0, -3.0, -236);
+  farGroup.add(b);
+  const edge = new THREE.Mesh(new THREE.BoxGeometry(600, 0.9, 1.4), new THREE.MeshStandardMaterial({ color: 0x1a2436, roughness: 0.9 }));
+  edge.position.set(0, 0.2, -213);
+  farGroup.add(edge);
+})();
+
 /* skyline blocks */
 (function city() {
-  const bMat = new THREE.MeshStandardMaterial({ color: 0x0a1220, roughness: 0.9, metalness: 0.1 });
-  for (let i = 0; i < 34; i++) {
-    const w = 4 + Math.random() * 10, h = 6 + Math.random() * 30, d = 4 + Math.random() * 8;
+  const bMat = new THREE.MeshStandardMaterial({ color: 0x0b1526, roughness: 0.9, metalness: 0.1 });
+  for (let i = 0; i < 40; i++) {
+    const w = 5 + Math.random() * 12, h = 6 + Math.random() * 26, d = 5 + Math.random() * 9;
     const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bMat);
-    b.position.set(-190 + i * 11 + Math.random() * 6, h / 2 - 1.2, -232 - Math.random() * 46);
+    b.position.set(-200 + i * 11 + Math.random() * 6, h / 2 - 1.4, -222 - Math.random() * 40);
     farGroup.add(b);
   }
   /* window lights */
-  const N = 420;
+  const N = 460;
   const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
   const cc = new THREE.Color();
   for (let i = 0; i < N; i++) {
-    pos[i*3] = -195 + Math.random() * 380;
-    pos[i*3+1] = 0.6 + Math.random() * 26;
-    pos[i*3+2] = -228 - Math.random() * 52;
-    cc.setHSL(0.09 + Math.random() * 0.04, 0.75, 0.55 + Math.random() * 0.3);
+    pos[i*3] = -200 + Math.random() * 400;
+    pos[i*3+1] = 0.4 + Math.random() * 22;
+    pos[i*3+2] = -220 - Math.random() * 44;
+    cc.setHSL(0.08 + Math.random() * 0.05, 0.7, 0.5 + Math.random() * 0.32);
     col[i*3] = cc.r; col[i*3+1] = cc.g; col[i*3+2] = cc.b;
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
   const p = new THREE.Points(g, new THREE.PointsMaterial({
-    size: 2.2, map: GLOW_TEX, vertexColors: true, transparent: true,
-    opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+    size: 2.0, map: GLOW_TEX, vertexColors: true, transparent: true,
+    opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
   }));
   farGroup.add(p);
 })();
@@ -760,60 +785,68 @@ for (let i = 0; i < 14; i++) {
   beacon2.position.y = 60.4; g.add(beacon2);
   const halo = glowSprite(0x6f8fbf, 120, 0.2);
   halo.position.y = 16; g.add(halo);
-  g.position.set(96, -2, -300);
+  g.position.set(112, -3, -288);
   farGroup.add(g);
   window.__beacon = beacon;
 })();
 
 /* =========================================================
-   8. bridge (crosses the river into the distance)
+   8. bridge across the river
    ========================================================= */
 (function bridge() {
   const g = new THREE.Group();
-  const deckMat = new THREE.MeshStandardMaterial({ color: 0x1b2231, roughness: 0.8, metalness: 0.2 });
-  const pierMat = new THREE.MeshStandardMaterial({ color: 0x161c28, roughness: 0.9, metalness: 0.1 });
+  const deckMat = new THREE.MeshStandardMaterial({ color: 0x232c3d, roughness: 0.75, metalness: 0.3 });
+  const pierMat = new THREE.MeshStandardMaterial({ color: 0x1a2130, roughness: 0.9, metalness: 0.1 });
 
-  const deck = new THREE.Mesh(new THREE.BoxGeometry(11, 1.3, 230), deckMat);
-  deck.position.set(0, 7.4, 0); g.add(deck);
-  const railTop = new THREE.Mesh(new THREE.BoxGeometry(11.4, 0.22, 230), new THREE.MeshStandardMaterial({ color: 0x2a3244, roughness: 0.6, metalness: 0.4 }));
-  railTop.position.set(0, 8.2, 0); g.add(railTop);
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(340, 1.7, 9), deckMat);
+  deck.position.set(0, 9.0, 0); g.add(deck);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(342, 0.42, 9.4), new THREE.MeshStandardMaterial({ color: 0x39445a, roughness: 0.6, metalness: 0.45 }));
+  top.position.set(0, 10.0, 0); g.add(top);
+  for (const zz of [4.6, -4.6]) {
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(340, 0.5, 0.3), new THREE.MeshStandardMaterial({ color: 0x2f3a4e, roughness: 0.6, metalness: 0.4 }));
+    rail.position.set(0, 10.6, zz); g.add(rail);
+  }
 
-  for (let i = 0; i < 9; i++) {
-    const z = -105 + i * 26;
-    const pier = new THREE.Mesh(new THREE.BoxGeometry(9, 8.6, 3.2), pierMat);
-    pier.position.set(0, -1.0, z);
+  for (let i = 0; i < 14; i++) {
+    const pier = new THREE.Mesh(new THREE.BoxGeometry(3.6, 11.6, 6.4), pierMat);
+    pier.position.set(-156 + i * 24, 2.9, 0);
     g.add(pier);
   }
 
-  /* deck lights */
-  const N = 96;
+  /* deck lights: a warm line along the near edge (classic Han river bridge) */
+  const N = 76;
   const pos = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) {
-    const z = -112 + (i % 48) * 4.6;
-    const side = i < 48 ? -1 : 1;
-    pos[i*3] = side * 5.2;
-    pos[i*3+1] = 8.05;
-    pos[i*3+2] = z;
+    pos[i*3]   = -166 + i * 4.45;
+    pos[i*3+1] = 10.55;
+    pos[i*3+2] = 4.75;
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const lights = new THREE.Points(geo, new THREE.PointsMaterial({
-    size: 5.2, map: GLOW_TEX, color: 0xffcf8f, transparent: true, opacity: 0.95,
+    size: 3.6, map: GLOW_TEX, color: 0xffd09a, transparent: true, opacity: 0.95,
     blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
   }));
   g.add(lights);
 
-  /* pier lights (cool) */
-  const pp = new Float32Array(9 * 3);
-  for (let i = 0; i < 9; i++) { pp[i*3] = 0; pp[i*3+1] = 2.6; pp[i*3+2] = -105 + i * 26; }
-  const pg = new THREE.BufferGeometry();
-  pg.setAttribute('position', new THREE.BufferAttribute(pp, 3));
-  g.add(new THREE.Points(pg, new THREE.PointsMaterial({
-    size: 3.4, map: GLOW_TEX, color: 0xa8c8ff, transparent: true, opacity: 0.7,
+  /* a dim second line on the far edge, to give the deck depth */
+  const pos2 = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) { pos2[i*3] = -166 + i * 4.45; pos2[i*3+1] = 10.55; pos2[i*3+2] = -4.75; }
+  const geo2 = new THREE.BufferGeometry();
+  geo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
+  g.add(new THREE.Points(geo2, new THREE.PointsMaterial({
+    size: 2.6, map: GLOW_TEX, color: 0x9fb8e8, transparent: true, opacity: 0.45,
     blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
   })));
 
-  g.position.set(-52, 0, -110);
+  /* light spilling from under the deck */
+  const spill = new THREE.Mesh(new THREE.PlaneGeometry(340, 7), new THREE.MeshBasicMaterial({
+    map: GLOW_TEX, color: 0xffa860, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  spill.position.set(0, 8.9, 4.9);
+  g.add(spill);
+
+  g.position.set(0, 0, -158);
   scene.add(g);
 })();
 
@@ -883,18 +916,18 @@ function tree(x, z, s) {
 
 /* fireflies */
 const fireflies = (function () {
-  const N = 60;
+  const N = 42;
   const pos = new Float32Array(N * 3);
   const seeds = [];
   for (let i = 0; i < N; i++) {
-    const x = (Math.random() - 0.5) * 46, z = -3 + Math.random() * 18, y = 0.4 + Math.random() * 2.4;
+    const x = (Math.random() - 0.5) * 44, z = -2 + Math.random() * 16, y = 0.5 + Math.random() * 2.1;
     pos[i*3] = x; pos[i*3+1] = y; pos[i*3+2] = z;
     seeds.push({ x, y, z, p: Math.random() * 6.28, s: 0.3 + Math.random() * 0.6 });
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const p = new THREE.Points(geo, new THREE.PointsMaterial({
-    size: 1.4, map: GLOW_TEX, color: 0xffd88a, transparent: true, opacity: 0.85,
+    size: 0.85, map: GLOW_TEX, color: 0xffd88a, transparent: true, opacity: 0.8,
     blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
   }));
   scene.add(p);
@@ -956,21 +989,24 @@ function buildMat(rec, isMine) {
 
   /* little character, sitting */
   const c = new THREE.Group();
-  const bodyMat = new THREE.MeshStandardMaterial({ color: rec.tone, roughness: 0.85, emissive: new THREE.Color(rec.tone).multiplyScalar(0.12) });
-  const body = new THREE.Mesh(new THREE.SphereGeometry(0.44, 20, 16), bodyMat);
-  body.scale.set(1, 1.08, 0.9);
-  body.position.y = 0.46; c.add(body);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.33, 20, 16), bodyMat);
-  head.position.y = 0.98; c.add(head);
-  for (const sx of [-0.19, 0.19]) {
-    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 10), bodyMat);
-    ear.position.set(sx, 1.24, 0.02); c.add(ear);
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), new THREE.MeshBasicMaterial({ color: 0x1a1a22 }));
-    eye.position.set(sx * 0.85, 1.0, 0.29); c.add(eye);
-    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff9db0, transparent: true, opacity: 0.55 }));
-    blush.position.set(sx * 1.45, 0.94, 0.24); c.add(blush);
-    const arm = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), bodyMat);
-    arm.position.set(sx * 1.9, 0.5, 0.06); c.add(arm);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: rec.tone, roughness: 0.85, emissive: new THREE.Color(rec.tone).multiplyScalar(0.16) });
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.40, 20, 16), bodyMat);
+  body.scale.set(1, 1.06, 0.9);
+  body.position.y = 0.42; c.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.30, 20, 16), bodyMat);
+  head.position.y = 0.90; c.add(head);
+  const earMat = bodyMat;
+  for (const sx of [-0.17, 0.17]) {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.095, 0.19, 10), earMat);
+    ear.position.set(sx, 1.19, 0);
+    ear.rotation.z = sx > 0 ? -0.26 : 0.26;
+    c.add(ear);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.042, 10, 8), new THREE.MeshBasicMaterial({ color: 0x1a1a22 }));
+    eye.position.set(sx * 0.78, 0.93, 0.265); c.add(eye);
+    const blush = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff9db0, transparent: true, opacity: 0.5 }));
+    blush.position.set(sx * 1.55, 0.865, 0.215); c.add(blush);
+    const arm = new THREE.Mesh(new THREE.SphereGeometry(0.105, 10, 8), bodyMat);
+    arm.position.set(sx * 1.85, 0.46, 0.05); c.add(arm);
   }
   c.position.set(0.55, 0, 0.15);
   c.rotation.y = -0.5;
@@ -991,6 +1027,19 @@ function buildMat(rec, isMine) {
   lantern.position.set(-1.45, 0, 0.75);
   g.add(lantern);
 
+  /* floating music note, the "tap me" cue */
+  const noteTex = canvasTexture(64, 64, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = '#ffe3b4';
+    g.font = 'bold 46px serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('♪', w / 2, h / 2 + 2);
+  });
+  const note = new THREE.Sprite(new THREE.SpriteMaterial({ map: noteTex, transparent: true, opacity: 0.85, depthWrite: false }));
+  note.scale.set(0.62, 0.62, 1);
+  note.position.set(0.75, 2.05, 0.1);
+  g.add(note);
+
   /* selection ring */
   const ring = new THREE.Mesh(
     new THREE.RingGeometry(2.05, 2.42, 64),
@@ -1008,7 +1057,7 @@ function buildMat(rec, isMine) {
     g.add(marker);
   }
 
-  g.userData = { matId: rec.id, char: c, ring, baseY: 0, isMine, phase: Math.random() * 6.28 };
+  g.userData = { matId: rec.id, char: c, ring, note, isMine, phase: Math.random() * 6.28 };
   scene.add(g);
   matGroups.push(g);
 
@@ -1353,6 +1402,10 @@ function animate() {
     if (!ud.char) return;
     ud.char.position.y = Math.sin(elapsed * 1.25 + ud.phase) * 0.035;
     ud.char.rotation.z = Math.sin(elapsed * 0.8 + ud.phase) * 0.03;
+    if (ud.note) {
+      ud.note.position.y = 2.05 + Math.sin(elapsed * 1.6 + ud.phase) * 0.13;
+      ud.note.material.opacity = 0.55 + 0.3 * (0.5 + 0.5 * Math.sin(elapsed * 2 + ud.phase));
+    }
     if (ud.ring.material.opacity > 0.01) {
       const p = 1 + Math.sin(elapsed * 2.4) * 0.06;
       ud.ring.scale.set(p, p, 1);
