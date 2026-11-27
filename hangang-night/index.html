@@ -339,11 +339,11 @@ controls.update();
 /* =========================================================
    2. lighting
    ========================================================= */
-scene.add(new THREE.AmbientLight(0x31456b, 1.15));
-const hemi = new THREE.HemisphereLight(0x4b6a9c, 0x101c15, 1.0);
+scene.add(new THREE.AmbientLight(0x3a4f78, 1.35));
+const hemi = new THREE.HemisphereLight(0x4b6a9c, 0x14231a, 1.15);
 scene.add(hemi);
-const moonLight = new THREE.DirectionalLight(0xd8e6ff, 1.05);
-moonLight.position.set(45, 78, -60);
+const moonLight = new THREE.DirectionalLight(0xd8e6ff, 1.5);
+moonLight.position.set(40, 70, -110);
 scene.add(moonLight);
 const warmFill = new THREE.PointLight(0xffb066, 14, 26, 2);
 warmFill.position.set(-2, 2.2, 4.5);
@@ -488,16 +488,22 @@ let starMat = null;
 const MOON = new THREE.Vector3(52, 78, -320);
 const moonMesh = new THREE.Mesh(
   new THREE.SphereGeometry(9, 32, 24),
-  new THREE.MeshBasicMaterial({ color: 0xfff4d6 })
+  new THREE.MeshBasicMaterial({ color: 0xfff8e6, toneMapped: false })
 );
 moonMesh.position.copy(MOON);
 scene.add(moonMesh);
-const moonGlow = glowSprite(0xffe6b8, 110, 0.5);
+const moonGlow = glowSprite(0xffe9c4, 120, 0.55);
+moonGlow.material.toneMapped = false;
 moonGlow.position.copy(MOON);
 scene.add(moonGlow);
-const moonGlow2 = glowSprite(0xffd9a0, 260, 0.16);
+const moonGlow2 = glowSprite(0xffd9a0, 300, 0.2);
+moonGlow2.material.toneMapped = false;
 moonGlow2.position.copy(MOON);
 scene.add(moonGlow2);
+const moonGlow3 = glowSprite(0x9fc0ff, 520, 0.1);
+moonGlow3.material.toneMapped = false;
+moonGlow3.position.copy(MOON);
+scene.add(moonGlow3);
 
 /* thin drifting clouds (dark silhouettes in front of the moon) */
 const cloudGroup = new THREE.Group();
@@ -551,7 +557,7 @@ const pathTex = canvasTexture(256, 256, (g, w, h) => {
 
 const lawn = new THREE.Mesh(
   new THREE.PlaneGeometry(240, 26),
-  new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1, metalness: 0, color: 0x9fb89a })
+  new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1, metalness: 0, color: 0xb4cba6 })
 );
 lawn.rotation.x = -Math.PI / 2;
 lawn.position.set(0, 0, 6.2);
@@ -604,8 +610,8 @@ scene.add(wall);
    ========================================================= */
 const waterUniforms = {
   uTime:  { value: 0 },
-  uDeep:  { value: new THREE.Color(0x08182e) },
-  uShallow:{ value: new THREE.Color(0x0d2a44) },
+  uDeep:  { value: new THREE.Color(0x0a2038) },
+  uShallow:{ value: new THREE.Color(0x123552) },
   uMoonX: { value: 0.624 },
   uMoonColor: { value: new THREE.Color(0xdfe8ff) }
 };
@@ -649,9 +655,9 @@ const water = new THREE.Mesh(
 
         /* moon path on the water */
         float dx = abs(uv.x - uMoonX);
-        float colBand = exp(-dx * dx * 15.0) * exp(-dx * 2.2);
+        float colBand = exp(-dx * dx * 11.0) * exp(-dx * 1.8);
         float flick = 0.35 + 1.05 * ripple;
-        col += uMoonColor * colBand * flick * smoothstep(0.02, 0.5, uv.y) * 0.30;
+        col += uMoonColor * colBand * flick * smoothstep(0.02, 0.5, uv.y) * 0.52;
 
         /* warm city shimmer on the far half */
         float warmBand = smoothstep(0.25, 1.0, uv.y) * (0.35 + 0.65 * ripple);
@@ -691,7 +697,9 @@ function addGlint({ x, z, w, d, color, opacity, speed, repeat }) {
 }
 addGlint({ x: 47, z: -72, w: 22, d: 130, color: 0xcfe0ff, opacity: 0.62, speed: 0.55, repeat: 1 });
 addGlint({ x: 56, z: -60, w: 9, d: 90, color: 0xbcd2ff, opacity: 0.4, speed: 0.4, repeat: 1 });
-addGlint({ x: 0, z: -150, w: 330, d: 46, color: 0xffb877, opacity: 0.5, speed: 0.9, repeat: 18 });
+addGlint({ x: 0, z: -150, w: 330, d: 46, color: 0xffb877, opacity: 0.55, speed: 0.9, repeat: 18 });
+addGlint({ x: 0, z: -200, w: 420, d: 34, color: 0xffa268, opacity: 0.34, speed: 1.3, repeat: 26 });
+addGlint({ x: 0, z: -196, w: 420, d: 22, color: 0x9fb8e8, opacity: 0.16, speed: 1.1, repeat: 30 });
 
 /* =========================================================
    7. far bank: hills, city skyline, N Seoul Tower
@@ -867,7 +875,7 @@ function streetLamp(x, z) {
   glow.position.copy(head.position); g.add(glow);
   const pool = new THREE.Mesh(
     new THREE.PlaneGeometry(9, 9),
-    new THREE.MeshBasicMaterial({ map: GLOW_TEX, color: 0xffb060, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending, depthWrite: false })
+    new THREE.MeshBasicMaterial({ map: GLOW_TEX, color: 0xffb060, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false })
   );
   pool.rotation.x = -Math.PI / 2;
   pool.position.set(0.82, 0.03, 0);
@@ -1021,8 +1029,8 @@ function buildMat(rec, isMine) {
   bulb.position.y = 0.36; lantern.add(bulb);
   const glow = glowSprite(0xffb469, 2.6, 0.72);
   glow.position.y = 0.4; lantern.add(glow);
-  const pool = new THREE.Mesh(new THREE.PlaneGeometry(5, 5),
-    new THREE.MeshBasicMaterial({ map: GLOW_TEX, color: 0xff9a4d, transparent: true, opacity: 0.17, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const pool = new THREE.Mesh(new THREE.PlaneGeometry(6, 6),
+    new THREE.MeshBasicMaterial({ map: GLOW_TEX, color: 0xff9a4d, transparent: true, opacity: 0.26, blending: THREE.AdditiveBlending, depthWrite: false }));
   pool.rotation.x = -Math.PI / 2; pool.position.y = 0.02; lantern.add(pool);
   lantern.position.set(-1.45, 0, 0.75);
   g.add(lantern);
