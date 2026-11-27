@@ -1899,6 +1899,7 @@ function applyOccupancy() {
     }
     refreshPudding(s);
     if (s.group) s.group.userData.kind = s.kind;
+    if (s.glow) s.glow.visible = s.kind === 'empty';
   });
   updateStats();
   updateDock();
@@ -1943,10 +1944,10 @@ function fitView(instant) {
 
 function focusSeat(idx, instant) {
   const p = seatPos(idx);
-  cam.tTarget.set(p.x, 0.96, p.z - 0.45);
-  cam.tRad = 4.3;
-  cam.tPol = 1.04;
-  cam.tAz = clamp(-p.x * 0.05, -0.32, 0.32);
+  cam.tTarget.set(p.x * 0.92, 1.0, p.z - 0.35);
+  cam.tRad = 5.6;
+  cam.tPol = 1.2;
+  cam.tAz = clamp(-p.x * 0.03, -0.22, 0.22);
   if (instant) { cam.az = cam.tAz; cam.pol = cam.tPol; cam.rad = cam.tRad; cam.target.copy(cam.tTarget); }
 }
 
@@ -2085,7 +2086,7 @@ function animate(ts) {
 
 function animateSeats(dt) {
   const t = sceneClock;
-  const nearZoom = cam.rad < 5.4;
+  const nearZoom = cam.rad < 6.0;
   seats.forEach((seat) => {
     if (seat.labels.bubble) {
       seat.labels.bubble.sprite.visible = seat.kind !== 'empty' && (!nearZoom || seat.isMe);
