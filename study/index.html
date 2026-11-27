@@ -838,7 +838,8 @@ let lastTapSeat = -1;
 
 const aspect = () => window.innerWidth / Math.max(1, window.innerHeight);
 const baseFov = () => (aspect() < 0.78 ? 60 : 46);
-const baseRadius = () => (aspect() < 0.78 ? 8.6 : 8.2);
+const baseRadius = () => (aspect() < 0.78 ? 9.9 : 9.7);
+const basePolar = () => (aspect() < 0.78 ? 1.33 : 1.36);
 
 function disposeScene() {
   if (!scene) return;
@@ -1048,7 +1049,7 @@ function buildMaterials() {
     wall: new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.94, metalness: 0.02 }),
     ceiling: new THREE.MeshStandardMaterial({ color: 0x14181e, roughness: 0.98, metalness: 0.0 }),
     wallDark: new THREE.MeshStandardMaterial({ color: 0x0d1116, roughness: 0.95 }),
-    deskTop: new THREE.MeshStandardMaterial({ color: 0x4b3423, roughness: 0.42, metalness: 0.08 }),
+    deskTop: new THREE.MeshStandardMaterial({ color: 0x5c4229, roughness: 0.4, metalness: 0.08 }),
     deskEdge: new THREE.MeshStandardMaterial({ color: 0x2a1c12, roughness: 0.55 }),
     panel: new THREE.MeshStandardMaterial({ color: 0x1b222a, roughness: 0.78, metalness: 0.1 }),
     metal: new THREE.MeshStandardMaterial({ color: 0x2b3138, roughness: 0.42, metalness: 0.72 }),
@@ -1769,7 +1770,7 @@ function makeDesk(seat) {
   placard.sprite.scale.set(0.66, 0.18, 1);
   placard.sprite.material.depthTest = true;
   // tilt the plate back a little by using a plane instead of sprite
-  const platWidth = 0.72, platH = 0.2;
+  const platWidth = 0.6, platH = 0.164;
   const plateMesh = new THREE.Mesh(
     new THREE.PlaneGeometry(platWidth, platH),
     platMat()
@@ -1786,9 +1787,9 @@ function makeDesk(seat) {
   seat.labels.placard = { canvas: placard.canvas, ctx: placard.ctx, texture: placard.texture, mesh: plateMesh };
 
   // time bubble sprite (created for everyone; hidden when empty)
-  const bub = makeLabelSprite(512, 300, 0.78);
-  bub.sprite.position.set(0, 1.62, -0.55);
-  bub.sprite.scale.set(0.78, 0.457, 1);
+  const bub = makeLabelSprite(512, 300, 0.66);
+  bub.sprite.position.set(0, 1.56, -0.55);
+  bub.sprite.scale.set(0.66, 0.387, 1);
   bub.sprite.visible = false;
   bub.sprite.renderOrder = 5;
   g.add(bub.sprite);
@@ -1925,9 +1926,9 @@ function updateCamera(dt) {
 
 function fitView(instant) {
   cam.tAz = 0;
-  cam.tPol = 1.31;
+  cam.tPol = basePolar();
   cam.tRad = baseRadius();
-  cam.tTarget.set(0, 1.16, -0.2);
+  cam.tTarget.set(0, 1.14, 0.0);
   if (instant) { cam.az = 0; cam.pol = cam.tPol; cam.rad = cam.tRad; cam.target.copy(cam.tTarget); }
 }
 
@@ -2628,9 +2629,9 @@ function onResize() {
   camera.fov = baseFov();
   camera.updateProjectionMatrix();
   if (!userTouchedCam) {
-    cam.tPol = 1.31;
+    cam.tPol = basePolar();
     cam.tRad = baseRadius();
-    cam.tTarget.set(0, 1.16, -0.2);
+    cam.tTarget.set(0, 1.14, 0.0);
   }
 }
 let userTouchedCam = false;
@@ -2692,9 +2693,9 @@ async function boot() {
   renderer.setClearColor(0x05070a, 1);
 
   raycaster = new THREE.Raycaster();
-  cam.target = new THREE.Vector3(0, 1.16, -0.2);
-  cam.tTarget = new THREE.Vector3(0, 1.16, -0.2);
-  cam.pol = cam.tPol = 1.31;
+  cam.target = new THREE.Vector3(0, 1.14, 0.0);
+  cam.tTarget = new THREE.Vector3(0, 1.14, 0.0);
+  cam.pol = cam.tPol = basePolar();
   cam.rad = cam.tRad = baseRadius();
   fitView(true);
 
