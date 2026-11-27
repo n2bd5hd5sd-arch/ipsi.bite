@@ -1947,7 +1947,7 @@ function focusSeat(idx, instant) {
   cam.tTarget.set(p.x * 0.92, 1.0, p.z - 0.35);
   cam.tRad = 5.6;
   cam.tPol = 1.2;
-  cam.tAz = clamp(-p.x * 0.03, -0.22, 0.22);
+  cam.tAz = 0;
   if (instant) { cam.az = cam.tAz; cam.pol = cam.tPol; cam.rad = cam.tRad; cam.target.copy(cam.tTarget); }
 }
 
