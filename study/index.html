@@ -2048,6 +2048,7 @@ let lastFrame = 0;
 let labelClock = 0;
 let peerClock = 0;
 let saveClock = 0;
+let perfAcc = 0, perfN = 0, perfChecked = false;
 
 function animate(ts) {
   requestAnimationFrame(animate);
@@ -2068,6 +2069,18 @@ function animate(ts) {
   if (saveClock > 12) { saveClock = 0; savePeers(); saveToday(); }
 
   renderer.render(scene, camera);
+
+  // one-shot quality guard for slower phones
+  if (!perfChecked) {
+    perfAcc += dt; perfN++;
+    if (perfN >= 150) {
+      perfChecked = true;
+      if (perfAcc / perfN > 0.038 && renderer.getPixelRatio() > 1.3) {
+        renderer.setPixelRatio(1.25);
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+      }
+    }
+  }
 }
 
 function animateSeats(dt) {
