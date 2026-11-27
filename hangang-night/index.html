@@ -1483,6 +1483,7 @@ $('songSearch').addEventListener('click', async () => {
 /* sheet */
 function openSheet() {
   const rec = myMatRecord;
+  pausePreview();
   $('searchResults').innerHTML = '';
   picked = null;
   if (rec) {
