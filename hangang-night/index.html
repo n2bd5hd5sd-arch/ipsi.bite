@@ -247,9 +247,9 @@
     </div>
     <button class="card-close" id="cardClose" aria-label="카드 닫기">✕</button>
   </div>
-  <h3 class="card-song" id="cardSong">밤편지</h3>
-  <div class="card-artist" id="cardArtist">아이유</div>
-  <p class="card-note" id="cardNote">자정이 넘어도 강바람은 안 자더라</p>
+  <h3 class="card-song" id="cardSong">seasons</h3>
+  <div class="card-artist" id="cardArtist">wave to earth</div>
+  <p class="card-note" id="cardNote">계절이 바뀌어도 이 강바람은 그대로더라</p>
   <div class="player" id="player">
     <button class="play" id="playBtn" aria-label="30초 미리듣기 재생"><span id="playIcon">▶</span></button>
     <div class="player-main">
@@ -284,7 +284,7 @@
     </label>
     <label class="field">
       <span>추천곡 제목</span>
-      <input id="fSong" maxlength="40" placeholder="예: 밤편지" autocomplete="off" required />
+      <input id="fSong" maxlength="40" placeholder="예: seasons" autocomplete="off" required />
     </label>
     <label class="field">
       <span>아티스트</span>
@@ -324,15 +324,15 @@ addEventListener('unhandledrejection', e => window.__errs.push(String(e.reason))
    0. data
    ========================================================= */
 const MATS = [
-  { id:'m01', nick:'밤산책러',   song:'밤편지',            artist:'아이유',       note:'자정이 넘어도 강바람은 안 자더라',            x:-11.0, z: 2.4, rot: 0.20, pal:['#f3e6c9','#b7a077'], tone:'#ffd9c4' },
-  { id:'m02', nick:'새벽두시반', song:'우주를 건너',        artist:'백예린',       note:'물 위로 번지는 불빛이 별보다 가까워서',        x: -6.4, z:-1.2, rot:-0.35, pal:['#2c3c5e','#e8dfc8'], tone:'#c6dcff' },
-  { id:'m03', nick:'망원동고양이',song:'주저하는 연인들을 위해', artist:'잔나비',  note:'다들 뭘 그렇게 망설여. 나는 이미 돗자리 폈어', x: -1.6, z: 1.6, rot: 0.50, pal:['#e0aaa2','#f7ecda'], tone:'#ffd2c4' },
-  { id:'m04', nick:'오리배선장', song:'Everything',        artist:'검정치마',     note:'이어폰 한쪽은 늘 강에 맡겨둬요',              x:  3.2, z:-2.8, rot:-0.12, pal:['#a9c6a2','#f2ead6'], tone:'#c8ecc6' },
-  { id:'m05', nick:'퇴근길피크닉',song:'스토커',            artist:'10cm',        note:'발끝만 젖어도 이상하게 기분이 좋아서',          x:  8.4, z: 0.6, rot: 0.32, pal:['#e7c56d','#3a2f22'], tone:'#ffe3ae' },
-  { id:'m06', nick:'별보는수달', song:'D (Half Moon)',      artist:'DEAN',        note:'달이 반쯤 차 있을 때가 제일 좋아요',          x: 12.6, z:-2.4, rot:-0.28, pal:['#c9c0e6','#f6f0dc'], tone:'#d9ccff' },
-  { id:'m07', nick:'한강치맥',   song:'여행',               artist:'볼빨간사춘기', note:'가는 곳 없이 걷는 밤, 그게 여행이지',         x:  0.8, z: 6.0, rot: 0.08, pal:['#dfe7ef','#7c8fa8'], tone:'#cfe0ff' },
-  { id:'m08', nick:'자전거체인', song:'Beautiful',          artist:'크러쉬',       note:'한 곡만 더 듣고 집에 가기로 했는데요',         x: -5.4, z: 6.6, rot:-0.44, pal:['#f0d9c2','#8f6d52'], tone:'#ffd9b8' },
-  { id:'m09', nick:'잠실야경',   song:'어떻게 이별까지 사랑하겠어', artist:'악동뮤지션', note:'물소리보다 노래가 작아서 볼륨은 조금 키웠어', x:  9.8, z: 5.4, rot: 0.24, pal:['#b8cfd8','#20303c'], tone:'#bfe9ec' }
+  { id:'m01', nick:'밤산책러',   song:'seasons',            artist:'wave to earth',      note:'계절이 바뀌어도 이 강바람은 그대로더라',        x:-11.0, z: 2.4, rot: 0.20, pal:['#f3e6c9','#b7a077'], tone:'#ffd9c4' },
+  { id:'m02', nick:'새벽두시반', song:'사랑하게 될 거야',    artist:'한로로',             note:'사랑하게 될 거야, 새벽에 혼자 듣는 그 말',      x: -6.4, z:-1.2, rot:-0.35, pal:['#2c3c5e','#e8dfc8'], tone:'#c6dcff' },
+  { id:'m03', nick:'망원동고양이',song:'Ditto',             artist:'뉴진스',             note:'겨울 냄새 나는 노래. 고양이는 발끝만 강 쪽으로', x: -1.6, z: 1.6, rot: 0.50, pal:['#e0aaa2','#f7ecda'], tone:'#ffd2c4' },
+  { id:'m04', nick:'오리배선장', song:'LIMBO',              artist:'keshi',              note:'오리배는 천천히, 노래는 더 천천히',            x:  3.2, z:-2.8, rot:-0.12, pal:['#a9c6a2','#f2ead6'], tone:'#c8ecc6' },
+  { id:'m05', nick:'퇴근길피크닉',song:'Always',             artist:'Daniel Caesar',      note:'퇴근길에 편 돗자리가 오늘 제일 먼 데 같아서',   x:  8.4, z: 0.6, rot: 0.32, pal:['#e7c56d','#3a2f22'], tone:'#ffe3ae' },
+  { id:'m06', nick:'별보는수달', song:'Sunsetz',            artist:'Cigarettes After Sex', note:'해가 진 자리에 별이 하나씩 켜지는 중',        x: 12.6, z:-2.4, rot:-0.28, pal:['#c9c0e6','#f6f0dc'], tone:'#d9ccff' },
+  { id:'m07', nick:'한강치맥',   song:'Pink + White',       artist:'Frank Ocean',        note:'치킨 식기 전에 이 노래 한 번만 더',            x:  0.8, z: 6.0, rot: 0.08, pal:['#dfe7ef','#7c8fa8'], tone:'#cfe0ff' },
+  { id:'m08', nick:'자전거체인', song:'toxic till the end', artist:'로제',               note:'페달은 천천히, 마음은 좀 빠르게',              x: -5.4, z: 6.6, rot:-0.44, pal:['#f0d9c2','#8f6d52'], tone:'#ffd9b8' },
+  { id:'m09', nick:'잠실야경',   song:'Popo',               artist:'백예린',             note:'야경보다 이 노래가 더 오래 남는 밤',           x:  9.8, z: 5.4, rot: 0.24, pal:['#b8cfd8','#20303c'], tone:'#bfe9ec' }
 ];
 
 const STORE = {
@@ -343,24 +343,24 @@ const STORE = {
 
 /* 30초 미리듣기: iTunes Search API로 실제 곡을 조회해 둔 값 (2026-11-27 기준) */
 const PREVIEWS = {
-  m01: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5a/43/d5/5a43d5c0-8b9a-2a91-dd9c-405bfd51b82f/mzaf_2888874735741039485.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/dc/12/fe/dc12fe03-172b-a843-0d96-12819fa05b6c/cover-.jpg/300x300bb.jpg', itunes:'IU – Through the Night' },
-  m02: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/18/a3/3b/18a33b0c-9bb7-4db4-5d99-93495815ba67/mzaf_13644385033728356274.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/f1/7d/f9/f17df9f4-af09-d19a-fc93-afeea02ad10e/738676855999_Cover.jpg/300x300bb.jpg', itunes:'Yerin Baek – Across the universe' },
-  m03: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b1/a4/0a/b1a40a3e-65ca-f51b-3bb9-12145d970895/mzaf_509885747699732949.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/fc/a9/b2/fca9b2d4-b1ed-92e8-2e5f-1838d77cbce7/cover-_NEW.jpg/300x300bb.jpg', itunes:'JANNABI – For Lovers Who Hesitate' },
-  m04: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ac/3a/56/ac3a56f8-d0b4-900c-5be7-c9d2ec4e6e92/mzaf_18435708929100952232.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/be/ce/5c/bece5cff-2caf-6d8a-9c21-3035537d2a4d/Album_cover_1400X1400.jpg/300x300bb.jpg', itunes:'The Black Skirts – EVERYTHING' },
-  m05: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/9f/51/3d9f5119-3d35-fd65-374d-d2db8127214f/mzaf_12305961986614200595.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/83/df/34/83df34b0-ab7d-7257-668a-7692f68fdc7a/5055946710525.jpg/300x300bb.jpg', itunes:'10CM – Stalker' },
-  m06: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/da/00/29/da0029b4-e181-857b-cfaf-489de6999020/mzaf_1580396445101899353.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/8e/a2/d0/8ea2d001-0b52-a451-4a7c-de35d3502155/00602547860828.rgb.jpg/300x300bb.jpg', itunes:'DEAN – D (Half Moon)' },
-  m07: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ff/96/0a/ff960a41-1d20-ce31-0943-7559cecde893/mzaf_1644908721555142325.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d3/4c/1c/d34c1cf3-0d36-df1e-c9a3-c0d16faf8c3f/8804775092534.jpg/300x300bb.jpg', itunes:'BOL4 – Travel' },
-  m08: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/41/e2/d1/41e2d146-6b36-94b7-9fab-527adc117622/mzaf_15100695928980147311.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/55/92/c4/5592c4a2-fe72-2302-0edb-0133f4548abb/8809534461279_Cover.jpg/300x300bb.jpg', itunes:'Crush – Beautiful' },
-  m09: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/14/16/55/1416558a-2bc2-a6a3-6943-cbb7bb61709d/mzaf_5601978480163855394.plus.aac.p.m4a',
-         art:'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e4/a2/80/e4a28015-490b-255a-ff26-aadd6257cfa1/AKMU_DS.jpg/300x300bb.jpg', itunes:'AKMU – How can I love the heartbreak' }
+  m01: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/db/d8/e3/dbd8e34a-eb7e-97c2-10d0-307364e9e775/mzaf_6657613653172078198.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/c5/61/fac561dc-8db4-b2e9-d3db-6e246da72bfa/5054197890017.jpg/300x300bb.jpg', itunes:'wave to earth – seasons' },
+  m02: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1d/14/b0/1d14b0a6-773d-7a46-fc1e-cd9855da0029/mzaf_18331909942495617093.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c2/ef/87/c2ef8779-f3bb-5a1c-ef6f-c27185e62446/8809936067307.jpg/300x300bb.jpg', itunes:'HANRORO – Landing in Love' },
+  m03: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/85/72/66/8572665a-d35f-ce5d-43c5-9ae4b69b4b46/mzaf_2317272666428796662.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/f6/29/42/f629426e-92fe-535c-cbe4-76e70850819b/196922287107_Cover.jpg/300x300bb.jpg', itunes:'NewJeans – Ditto' },
+  m04: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/af/4f/17af4f54-993d-b209-8bc7-46ea888f1280/mzaf_1848130934536833127.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/e2/de/98/e2de9860-b40b-e33f-f68e-ab8e0956a538/22UMGIM07345.rgb.jpg/300x300bb.jpg', itunes:'keshi – LIMBO' },
+  m05: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/29/94/e4/2994e49b-8613-f5bb-8533-7cf13de92630/mzaf_12958362463531140094.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/91/30/85/9130858b-bc2c-ec38-cf9f-864befea4374/23UMGIM38673.rgb.jpg/300x300bb.jpg', itunes:'Daniel Caesar – Always' },
+  m06: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/a4/4a/44a44a75-0576-12fa-6002-2f464c091102/mzaf_17923299166743083363.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b3/5e/0f/b35e0fbe-2370-fc48-0f0c-977525e93bf2/720841214601_Cover.jpg/300x300bb.jpg', itunes:'Cigarettes After Sex – Sunsetz' },
+  m07: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ba/11/dc/ba11dccd-16d2-9cd8-13f0-85b73acc0a09/mzaf_1304250511099243436.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/45/68/bb4568f3-68cd-619d-fbcb-4e179916545d/BlondCover-Final.jpg/300x300bb.jpg', itunes:'Frank Ocean – Pink + White' },
+  m08: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/45/15/49/451549d8-ddd7-dad4-0f3d-588a0c9d1b98/mzaf_17766988925119316702.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2d/14/66/2d14661b-345b-d0f3-4e86-56ef626e68aa/075679629203.jpg/300x300bb.jpg', itunes:'ROSÉ – toxic till the end' },
+  m09: { preview:'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f3/e4/37/f3e4377b-88ca-b7ef-4010-28b87ca5bb4c/mzaf_15316372445374388072.plus.aac.p.m4a',
+         art:'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ca/58/77/ca5877d9-2e1e-0456-c3b2-7704e423dc70/Every_letter_I_sent_you_3000.jpg/300x300bb.jpg', itunes:'Yerin Baek – Popo (How deep is our love?)' }
 };
 MATS.forEach(m => { const p = PREVIEWS[m.id]; if (p) Object.assign(m, p); });
 
