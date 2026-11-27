@@ -555,7 +555,7 @@ const grassTex = canvasTexture(256, 256, (g, w, h) => {
     g.lineWidth = 1;
     g.beginPath(); g.moveTo(x, y); g.lineTo(x + (Math.random()-0.5)*2, y - l); g.stroke();
   }
-}, [26, 4]);
+}, [26, 9.5]);
 
 const pathTex = canvasTexture(256, 256, (g, w, h) => {
   g.fillStyle = '#2b2f3a'; g.fillRect(0, 0, w, h);
@@ -567,11 +567,11 @@ const pathTex = canvasTexture(256, 256, (g, w, h) => {
 }, [30, 1]);
 
 const lawn = new THREE.Mesh(
-  new THREE.PlaneGeometry(240, 26),
+  new THREE.PlaneGeometry(240, 62),
   new THREE.MeshStandardMaterial({ map: grassTex, roughness: 1, metalness: 0, color: 0xb4cba6 })
 );
 lawn.rotation.x = -Math.PI / 2;
-lawn.position.set(0, 0, 6.2);
+lawn.position.set(0, 0, 24.2);
 scene.add(lawn);
 
 const path = new THREE.Mesh(
@@ -955,7 +955,7 @@ const fireflies = (function () {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const p = new THREE.Points(geo, new THREE.PointsMaterial({
-    size: 0.85, map: GLOW_TEX, color: 0xffd88a, transparent: true, opacity: 0.8,
+    size: 0.7, map: GLOW_TEX, color: 0xffcf7a, transparent: true, opacity: 0.55,
     blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
   }));
   scene.add(p);
