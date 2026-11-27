@@ -263,6 +263,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from './OrbitControls.js';
 
+/* runtime diagnostics: nothing is shown, but failures can be read later */
+window.__errs = [];
+addEventListener('error', e => window.__errs.push(String(e.message || e.error)));
+addEventListener('unhandledrejection', e => window.__errs.push(String(e.reason)));
+
 /* =========================================================
    0. data
    ========================================================= */
@@ -307,7 +312,7 @@ const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x081021, 0.0028);
 
 const camera = new THREE.PerspectiveCamera(56, 1, 0.1, 2000);
-const START = { pos: new THREE.Vector3(0, 10, 27), target: new THREE.Vector3(0, 2.2, -16) };
+const START = { pos: new THREE.Vector3(0, 10.4, 29), target: new THREE.Vector3(0, 2.2, -16) };
 
 function fitCamera() {
   const aspect = window.innerWidth / window.innerHeight;
@@ -519,6 +524,12 @@ scene.add(cloudGroup);
       grd.addColorStop(1, 'rgba(255,255,255,0)');
       g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, 6.283); g.fill();
     }
+    g.globalCompositeOperation = 'destination-in';
+    const mask = g.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/2);
+    mask.addColorStop(0, 'rgba(0,0,0,1)');
+    mask.addColorStop(0.5, 'rgba(0,0,0,.55)');
+    mask.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = mask; g.fillRect(0, 0, w, h);
   });
   for (let i = 0; i < 5; i++) {
     const m = new THREE.Mesh(
@@ -1069,8 +1080,19 @@ function buildMat(rec, isMine) {
   /* my mat marker */
   let marker = null;
   if (isMine) {
-    marker = glowSprite(0xffe0a0, 2.2, 0.9);
-    marker.position.set(0, 1.9, 0);
+    const labelTex = canvasTexture(256, 96, (g, w, h) => {
+      g.clearRect(0, 0, w, h);
+      g.fillStyle = 'rgba(255,219,168,.95)';
+      if (g.roundRect) { g.beginPath(); g.roundRect(10, 14, w - 20, h - 28, 34); g.fill(); }
+      else { g.fillRect(10, 14, w - 20, h - 28); }
+      g.fillStyle = '#31200a';
+      g.font = 'bold 40px "Apple SD Gothic Neo",sans-serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('내 돗자리', w / 2, h / 2 + 1);
+    });
+    marker = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex, transparent: true, depthWrite: false }));
+    marker.scale.set(1.9, 0.71, 1);
+    marker.position.set(0.55, 2.2, 0.15);
     g.add(marker);
   }
 
@@ -1210,7 +1232,7 @@ function flyTo(x, z) {
   const startTarget = controls.target.clone();
   const targetY = 0.9;
   const endTarget = new THREE.Vector3(x * 0.72, targetY, z * 0.55 - 2.2);
-  const endPos = new THREE.Vector3(x * 0.55, 6.2, z + 11.5);
+  const endPos = new THREE.Vector3(x * 0.55, 6.6, z + 12.5);
   fly = { startPos, startTarget, endPos, endTarget, t: 0, dur: 1.15 };
   controls.enabled = false;
 }
@@ -1230,8 +1252,8 @@ $('matForm').addEventListener('submit', e => {
     song: song.slice(0, 40),
     artist: artist.slice(0, 30),
     note: note.slice(0, 60),
-    x: isFirst ? 1.4 : myMatRecord.x,
-    z: isFirst ? 9.4 : myMatRecord.z,
+    x: isFirst ? -2.4 : myMatRecord.x,
+    z: isFirst ? 9.2 : myMatRecord.z,
     rot: isFirst ? -0.06 : myMatRecord.rot,
     pal: ['#f7ecd2', '#c8a87a'],
     tone: '#ffe0c9'
@@ -1465,8 +1487,8 @@ animate();
 
 /* keep the initial framing sensible on small screens */
 if (fitCamera()) {
-  camera.position.set(0, 9.6, 27.5);
-  controls.target.set(0, 1.4, -8);
+  camera.position.set(0, 11.5, 32);
+  controls.target.set(0, 2.4, -16);
   controls.update();
 }
 </script>
