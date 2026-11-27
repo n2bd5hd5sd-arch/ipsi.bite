@@ -1943,10 +1943,10 @@ function fitView(instant) {
 
 function focusSeat(idx, instant) {
   const p = seatPos(idx);
-  cam.tTarget.set(p.x * 0.85, 0.92, p.z * 0.85 - 0.1);
-  cam.tRad = 3.9;
-  cam.tPol = 1.34;
-  cam.tAz = clamp(-p.x * 0.04, -0.3, 0.3);
+  cam.tTarget.set(p.x, 0.96, p.z - 0.45);
+  cam.tRad = 4.3;
+  cam.tPol = 1.04;
+  cam.tAz = clamp(-p.x * 0.05, -0.32, 0.32);
   if (instant) { cam.az = cam.tAz; cam.pol = cam.tPol; cam.rad = cam.tRad; cam.target.copy(cam.tTarget); }
 }
 
@@ -2085,7 +2085,11 @@ function animate(ts) {
 
 function animateSeats(dt) {
   const t = sceneClock;
+  const nearZoom = cam.rad < 5.4;
   seats.forEach((seat) => {
+    if (seat.labels.bubble) {
+      seat.labels.bubble.sprite.visible = seat.kind !== 'empty' && (!nearZoom || seat.isMe);
+    }
     const p = seat.pudding;
     if (p) {
       const ph = seat.phase;
