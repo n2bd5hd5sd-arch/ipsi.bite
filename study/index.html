@@ -837,9 +837,9 @@ let myPudding = null;
 let lastTapSeat = -1;
 
 const aspect = () => window.innerWidth / Math.max(1, window.innerHeight);
-const baseFov = () => (aspect() < 0.78 ? 60 : 46);
-const baseRadius = () => (aspect() < 0.78 ? 9.9 : 9.7);
-const basePolar = () => (aspect() < 0.78 ? 1.33 : 1.36);
+const baseFov = () => (aspect() < 0.78 ? 62 : 50);
+const baseRadius = () => (aspect() < 0.78 ? 7.7 : 6.6);
+const basePolar = () => (aspect() < 0.78 ? 1.33 : 1.30);
 
 function disposeScene() {
   if (!scene) return;
@@ -1787,9 +1787,9 @@ function makeDesk(seat) {
   seat.labels.placard = { canvas: placard.canvas, ctx: placard.ctx, texture: placard.texture, mesh: plateMesh };
 
   // time bubble sprite (created for everyone; hidden when empty)
-  const bub = makeLabelSprite(512, 300, 0.66);
-  bub.sprite.position.set(0, 1.56, -0.55);
-  bub.sprite.scale.set(0.66, 0.387, 1);
+  const bub = makeLabelSprite(512, 300, 0.6);
+  bub.sprite.position.set(0, 1.52, -0.55);
+  bub.sprite.scale.set(0.6, 0.352, 1);
   bub.sprite.visible = false;
   bub.sprite.renderOrder = 5;
   g.add(bub.sprite);
@@ -1928,7 +1928,7 @@ function fitView(instant) {
   cam.tAz = 0;
   cam.tPol = basePolar();
   cam.tRad = baseRadius();
-  cam.tTarget.set(0, 1.14, 0.0);
+  cam.tTarget.set(0, 1.06, -0.5);
   if (instant) { cam.az = 0; cam.pol = cam.tPol; cam.rad = cam.tRad; cam.target.copy(cam.tTarget); }
 }
 
@@ -2631,7 +2631,7 @@ function onResize() {
   if (!userTouchedCam) {
     cam.tPol = basePolar();
     cam.tRad = baseRadius();
-    cam.tTarget.set(0, 1.14, 0.0);
+    cam.tTarget.set(0, 1.06, -0.5);
   }
 }
 let userTouchedCam = false;
@@ -2693,8 +2693,8 @@ async function boot() {
   renderer.setClearColor(0x05070a, 1);
 
   raycaster = new THREE.Raycaster();
-  cam.target = new THREE.Vector3(0, 1.14, 0.0);
-  cam.tTarget = new THREE.Vector3(0, 1.14, 0.0);
+  cam.target = new THREE.Vector3(0, 1.06, -0.5);
+  cam.tTarget = new THREE.Vector3(0, 1.06, -0.5);
   cam.pol = cam.tPol = basePolar();
   cam.rad = cam.tRad = baseRadius();
   fitView(true);
