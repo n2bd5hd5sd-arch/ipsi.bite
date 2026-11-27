@@ -488,20 +488,20 @@ let starMat = null;
 const MOON = new THREE.Vector3(52, 78, -320);
 const moonMesh = new THREE.Mesh(
   new THREE.SphereGeometry(9, 32, 24),
-  new THREE.MeshBasicMaterial({ color: 0xfff8e6, toneMapped: false })
+  new THREE.MeshBasicMaterial({ color: 0xfff8e6, toneMapped: false, fog: false })
 );
 moonMesh.position.copy(MOON);
 scene.add(moonMesh);
 const moonGlow = glowSprite(0xffe9c4, 120, 0.55);
-moonGlow.material.toneMapped = false;
+moonGlow.material.toneMapped = false; moonGlow.material.fog = false;
 moonGlow.position.copy(MOON);
 scene.add(moonGlow);
-const moonGlow2 = glowSprite(0xffd9a0, 300, 0.2);
-moonGlow2.material.toneMapped = false;
+const moonGlow2 = glowSprite(0xffd9a0, 300, 0.22);
+moonGlow2.material.toneMapped = false; moonGlow2.material.fog = false;
 moonGlow2.position.copy(MOON);
 scene.add(moonGlow2);
-const moonGlow3 = glowSprite(0x9fc0ff, 520, 0.1);
-moonGlow3.material.toneMapped = false;
+const moonGlow3 = glowSprite(0x9fc0ff, 520, 0.12);
+moonGlow3.material.toneMapped = false; moonGlow3.material.fog = false;
 moonGlow3.position.copy(MOON);
 scene.add(moonGlow3);
 
@@ -570,6 +570,15 @@ const path = new THREE.Mesh(
 path.rotation.x = -Math.PI / 2;
 path.position.set(0, 0.012, -9.9);
 scene.add(path);
+
+/* stone curb between the path and the lawn */
+const curbMat = new THREE.MeshStandardMaterial({ color: 0x4a4f5c, roughness: 0.8, metalness: 0.1 });
+const curb = new THREE.Mesh(new THREE.BoxGeometry(240, 0.16, 0.34), curbMat);
+curb.position.set(0, 0.07, -6.28);
+scene.add(curb);
+const curb2 = curb.clone();
+curb2.position.z = -13.5;
+scene.add(curb2);
 
 /* far ground under everything */
 const under = new THREE.Mesh(
@@ -657,11 +666,11 @@ const water = new THREE.Mesh(
         float dx = abs(uv.x - uMoonX);
         float colBand = exp(-dx * dx * 11.0) * exp(-dx * 1.8);
         float flick = 0.35 + 1.05 * ripple;
-        col += uMoonColor * colBand * flick * smoothstep(0.02, 0.5, uv.y) * 0.52;
+        col += uMoonColor * colBand * flick * smoothstep(0.02, 0.5, uv.y) * 0.62;
 
-        /* warm city shimmer on the far half */
-        float warmBand = smoothstep(0.25, 1.0, uv.y) * (0.35 + 0.65 * ripple);
-        col += vec3(0.16, 0.10, 0.05) * warmBand * 0.35;
+        /* soften into the far haze */
+        float haze = smoothstep(0.30, 1.0, uv.y);
+        col = mix(col, vec3(0.045, 0.085, 0.135), haze * 0.42);
 
         /* sparkles of broken light */
         float spark = smoothstep(0.74, 0.96, n2) * (0.25 + 0.75 * smoothstep(0.2, 0.9, uv.y));
@@ -698,8 +707,8 @@ function addGlint({ x, z, w, d, color, opacity, speed, repeat }) {
 addGlint({ x: 47, z: -72, w: 22, d: 130, color: 0xcfe0ff, opacity: 0.62, speed: 0.55, repeat: 1 });
 addGlint({ x: 56, z: -60, w: 9, d: 90, color: 0xbcd2ff, opacity: 0.4, speed: 0.4, repeat: 1 });
 addGlint({ x: 0, z: -150, w: 330, d: 46, color: 0xffb877, opacity: 0.55, speed: 0.9, repeat: 18 });
-addGlint({ x: 0, z: -200, w: 420, d: 34, color: 0xffa268, opacity: 0.34, speed: 1.3, repeat: 26 });
-addGlint({ x: 0, z: -196, w: 420, d: 22, color: 0x9fb8e8, opacity: 0.16, speed: 1.1, repeat: 30 });
+addGlint({ x: 0, z: -200, w: 420, d: 34, color: 0xffa268, opacity: 0.22, speed: 1.3, repeat: 26 });
+addGlint({ x: 0, z: -196, w: 420, d: 22, color: 0x9fb8e8, opacity: 0.1, speed: 1.1, repeat: 30 });
 
 /* =========================================================
    7. far bank: hills, city skyline, N Seoul Tower
@@ -715,7 +724,7 @@ scene.add(farGroup);
   ]) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(cfg.w, cfg.h), new THREE.MeshBasicMaterial({
       map: GLOW_TEX, color: cfg.c, transparent: true, opacity: cfg.o,
-      blending: THREE.AdditiveBlending, depthWrite: false
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false
     }));
     m.position.set(0, cfg.y, cfg.z);
     farGroup.add(m);
@@ -874,11 +883,11 @@ function streetLamp(x, z) {
   const glow = glowSprite(0xffc178, 4.6, 0.6);
   glow.position.copy(head.position); g.add(glow);
   const pool = new THREE.Mesh(
-    new THREE.PlaneGeometry(9, 9),
-    new THREE.MeshBasicMaterial({ map: GLOW_TEX, color: 0xffb060, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false })
+    new THREE.PlaneGeometry(12, 12),
+    new THREE.MeshBasicMaterial({ map: GLOW_TEX, color: 0xffa95c, transparent: true, opacity: 0.42, blending: THREE.AdditiveBlending, depthWrite: false })
   );
   pool.rotation.x = -Math.PI / 2;
-  pool.position.set(0.82, 0.03, 0);
+  pool.position.set(0.82, 0.02, 0);
   g.add(pool);
   g.position.set(x, 0, z);
   scene.add(g);
