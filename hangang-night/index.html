@@ -240,7 +240,7 @@
 
 <section class="dj-card" id="djCard" aria-live="polite">
   <div class="card-head">
-    <div class="disc"></div>
+    <div class="disc" id="cardDisc"></div>
     <div class="card-meta">
       <div class="card-kicker"><span class="eq"><i></i><i></i><i></i></span><span>지금 듣는 노래</span></div>
       <div class="card-nick" id="cardNick">밤산책러</div>
@@ -1291,6 +1291,7 @@ function setupPreview(rec) {
 
 function setDiscArt(rec) {
   const disc = $('cardDisc');
+  if (!disc) return;
   if (rec.art) {
     disc.style.backgroundImage = 'url("' + rec.art + '")';
     disc.classList.add('has-art');
